@@ -3,7 +3,7 @@ import path from 'path';
 import commonjs from '@rollup/plugin-commonjs';
 import filesize from 'rollup-plugin-filesize';
 import postcss from 'rollup-plugin-postcss';
-import postcssUrl from './build/plugins/postcssUrl';
+import postcssUrl from './scripts/plugins/postcssUrl';
 
 const env = process.env.NODE_ENV;
 const pkg = require('./package.json');
