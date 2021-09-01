@@ -10,7 +10,7 @@ import './style.scss';
 
 const CONTROLS_WIDTH = 0;
 
-const getOverlaysCfg = layers => {
+const getOverlaysCfg = (layers = []) => {
 	const LINEHEIGHT = 1;
 	const ROWHEIGHT = 0.6; //in rem
 	let PADDING = (LINEHEIGHT - ROWHEIGHT) / 2;
@@ -28,7 +28,7 @@ const getOverlaysCfg = layers => {
 		if (layerCfg && layerCfg.period && layerCfg.period.length) {
 			const cfgs = layerCfg.period.map((period, index) => {
 				const cfg = {
-					key: `${layerCfg.layerTemplateKey}-${index}`,
+					key: `${layerCfg.key}-${index}`,
 					layerTemplateKey: layerCfg.layerTemplateKey,
 					periodIndex: index,
 					start: moment(period.start),
@@ -47,7 +47,7 @@ const getOverlaysCfg = layers => {
 			return [...acc, ...cfgs];
 		} else {
 			const cfg = {
-				key: layerCfg.layerTemplateKey,
+				key: layerCfg.key,
 				layerTemplateKey: layerCfg.layerTemplateKey,
 				start: moment(layerCfg.period.start),
 				end: moment(layerCfg.period.end),
@@ -111,6 +111,8 @@ class MapTimeline extends React.PureComponent {
 		height: 100,
 		selectMode: false,
 		vertical: false,
+		layers: [],
+		legend: false,
 	};
 
 	render() {

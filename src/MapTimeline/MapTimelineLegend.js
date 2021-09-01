@@ -14,7 +14,7 @@ class MapTimelineLegand extends React.PureComponent {
 		const layersElms = layers.map(layer => {
 			return (
 				<span
-					key={layer.layerTemplateKey}
+					key={layer.key}
 					className={'ptr-maptimeline-legenditem'}
 					title={`${layer.title} ${layer.info}`}
 				>
