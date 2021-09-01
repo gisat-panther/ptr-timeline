@@ -4,7 +4,7 @@ import moment from 'moment';
 import {withResizeDetector} from 'react-resize-detector';
 
 import {ContextProvider} from './context';
-import TimelineContent from './timelineContent';
+import TimelineContent from './TimelineContent';
 
 const CONTROLS_WIDTH = 0;
 
