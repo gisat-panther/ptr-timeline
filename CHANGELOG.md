@@ -1,3 +1,16 @@
+# v0.0.4 (Wed Sep 01 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Fix caption in imports ([@vdubr](https://github.com/vdubr))
+- Fix caption ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.2 (Fri Aug 27 2021)
 
 #### ⚠️ Pushed to `master`
