@@ -5,7 +5,7 @@ import moment from 'moment';
 import {getMinutes, getHours} from '../utils/interval';
 import Label from '../utils/textLabel';
 import MinuteDash from './MinuteDash';
-import HourDash from '../hours/HourDash';
+import HourDash from '../Hours/HourDash';
 import './style.scss';
 
 const Minutes = props => {

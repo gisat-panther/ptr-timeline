@@ -7,8 +7,8 @@ import {getYears, getMonths, getDays, getHours} from '../utils/interval';
 import Label from '../utils/textLabel';
 import HourDash from '../hours/HourDash';
 import DayDash from './DayDash';
-import MonthDash from '../months/MonthDash';
-import YearDash from '../years/YearDash';
+import MonthDash from '../Months/MonthDash';
+import YearDash from '../Years/YearDash';
 
 const Days = props => {
 	const {period, getX, dayWidth, height, vertical} = props;

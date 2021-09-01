@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Label from '../utils/textLabel';
 import MonthDash from './MonthDash';
-import YearDash from '../years/YearDash';
+import YearDash from '../Years/YearDash';
 import {getYears, getMonths} from '../utils/interval';
 import './style.scss';
 

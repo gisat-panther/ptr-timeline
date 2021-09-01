@@ -4,9 +4,9 @@ import {map as _map} from 'lodash';
 import moment from 'moment';
 import {getMinutes, getDays, getHours} from '../utils/interval';
 import Label from '../utils/textLabel';
-import MinuteDash from '../minutes/MinuteDash';
+import MinuteDash from '../Minutes/MinuteDash';
 import HourDash from './HourDash';
-import DayDash from '../days/DayDash';
+import DayDash from '../Days/DayDash';
 import './style.scss';
 
 const Hours = props => {
