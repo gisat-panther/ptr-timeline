@@ -1,6 +1,6 @@
 import React from 'react';
 
-import hoverContext from '../HoverHandler/context';
+import hoverContext from './HoverHandler/context';
 
 class TimelineHover extends React.PureComponent {
 	static contextType = hoverContext;
@@ -10,12 +10,17 @@ class TimelineHover extends React.PureComponent {
 	}
 
 	onHover(evt) {
-		if (evt) {
+		const popupContent =
+			(evt && this.props.getHoverContent(evt.x, evt.time, evt)) || null;
+		if (
+			popupContent &&
+			(React.isValidElement(popupContent) || popupContent?.popup?.content)
+		) {
 			this.context.onHover(['timeline'], {
 				popup: {
 					x: evt.x,
 					y: evt.y,
-					content: this.props.getHoverContent(evt.x, evt.time, evt) || null,
+					content: popupContent,
 				},
 			});
 		} else {

@@ -11,11 +11,16 @@
     bottom: 170px;
 } */
 
-.timelineWrapper.vertical .ptr-timeline-container {
-	height: 100%;
-}
+// .timelineWrapper.vertical .ptr-timeline-container {
+// 	height: 100%;
+// }
 
-.timelineWrapper.horizontal .ptr-timeline-container {
+// .timelineWrapper.horizontal .ptr-timeline-container {
+// 	width: 100%;
+// }
+
+.ptr-events-wrapper {
+	height: 100%;
 	width: 100%;
 }
 

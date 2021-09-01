@@ -54,6 +54,7 @@ const Overlay = props => {
 				<g
 					key={`${overlay.key}`}
 					className={classNames('ptr-timeline-overlay', overlay.classes)}
+					onClick={onOverlayClick}
 				>
 					<rect
 						x={x}
@@ -63,7 +64,6 @@ const Overlay = props => {
 						ry={eHeight / 2}
 						height={eHeight}
 						fill={overlay.backgound}
-						onClick={onOverlayClick}
 					/>
 					{label}
 				</g>

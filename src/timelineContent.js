@@ -21,18 +21,6 @@ const TimelineContent = ({children, ...propsWithoutChildren}) => {
 		activeLevel,
 	} = context;
 
-	// fix bubling wheel event
-	// https://github.com/facebook/react/issues/14856#issuecomment-586781399
-	useEffect(() => {
-		const cancelWheel = event => event.preventDefault();
-
-		document.body.addEventListener('wheel', cancelWheel, {passive: false});
-
-		return () => {
-			document.body.removeEventListener('wheel', cancelWheel);
-		};
-	}, []);
-
 	const elementWidth = vertical ? height : width;
 	const elementHeight = vertical ? width : height;
 	const transform = vertical ? `scale(-1,1) translate(-${height},0)` : '';

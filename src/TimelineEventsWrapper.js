@@ -93,6 +93,12 @@ class TimelineEventsWrapper extends React.PureComponent {
 		this.node.current.addEventListener('touchmove', this.move_handler);
 		this.node.current.addEventListener('touchend', this.end_handler);
 		this.node.current.addEventListener('touchcancel', this.end_handler);
+		// fix bubling wheel event
+		// https://github.com/facebook/react/issues/14856#issuecomment-586781399
+		this.node.current.addEventListener('wheel', this.onWheel, {
+			passive: false,
+			capture: true,
+		});
 	}
 
 	componentWillUnmount() {
@@ -101,6 +107,7 @@ class TimelineEventsWrapper extends React.PureComponent {
 
 		this.node.current.removeEventListener('touchend', this.end_handler);
 		this.node.current.removeEventListener('touchcancel', this.end_handler);
+		this.node.current.removeEventListener('wheel', this.onWheel);
 	}
 
 	end_handler(ev) {
@@ -543,6 +550,7 @@ class TimelineEventsWrapper extends React.PureComponent {
 	 */
 	onWheel(e) {
 		const {dayWidth} = this.context;
+		e.preventDefault();
 		let change;
 
 		if (e.deltaY > 0) {
@@ -681,9 +689,9 @@ class TimelineEventsWrapper extends React.PureComponent {
 
 		return (
 			<div
+				className={'ptr-events-wrapper'}
 				ref={this.node}
 				onMouseLeave={this.onMouseLeave}
-				onWheel={this.onWheel}
 				onMouseDown={this.onMouseDown}
 				onMouseUp={this.onMouseUp}
 				onMouseMove={this.onMouseMove}
