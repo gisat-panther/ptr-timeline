@@ -1,3 +1,16 @@
+# v0.0.3 (Wed Sep 01 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Make gic case sensitive ([@vdubr](https://github.com/vdubr))
+- Fix tooltip, zooming, styles ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.2 (Fri Aug 27 2021)
 
 #### ⚠️ Pushed to `master`
