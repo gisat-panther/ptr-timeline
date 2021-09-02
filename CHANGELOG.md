@@ -1,3 +1,16 @@
+# v0.0.6 (Thu Sep 02 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Mirror overlay and MapTimeline legeng fixes ([@vdubr](https://github.com/vdubr))
+- Fix popup positioning ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.5 (Wed Sep 01 2021)
 
 #### ⚠️ Pushed to `master`
