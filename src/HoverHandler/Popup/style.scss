@@ -3,9 +3,7 @@
 
 .ptr-popup {
 	position: fixed;
-	// uncomment
-	// background: rgba(var(--base0rgb), .95);
-	// position: absolute;
+	background: rgba(var(--base0rgb), 0.95);
 	z-index: 99999;
 	padding: 0.5rem 0.75rem;
 	border: 1px solid rgba(255, 255, 255, 0.5);
@@ -13,8 +11,8 @@
 	box-shadow: 1px 3px 7px 3px rgba(0, 0, 0, 0.2);
 	// uncomment
 	// font-size: $b1;
-	// uncomment
-	// color: var(--base80);
+	font-size: 0.809rem;
+	color: var(--base80);
 	min-width: 8rem;
 	min-height: 2rem;
 }
@@ -22,6 +20,7 @@
 .ptr-popup-header {
 	// uncomment
 	// font-size: $a1;
+	font-size: 1rem;
 	font-weight: bold;
 	display: flex;
 	align-items: center;
@@ -41,8 +40,7 @@
 .ptr-popup-record-color {
 	min-width: 0.35rem;
 	margin: 0.1rem 0.5rem 0.1rem 0;
-	// uncomment
-	// background: var(--accent50);
+	background: var(--accent50);
 }
 
 .ptr-popup-header .ptr-popup-record-color {
@@ -55,8 +53,7 @@
 }
 
 .ptr-popup-record-attribute {
-	// uncomment
-	// color: var(--base50);
+	color: var(--base50);
 	margin-bottom: 0.15rem;
 }
 

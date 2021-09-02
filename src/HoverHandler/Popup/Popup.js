@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {getTootlipPosition} from '../position';
 import classnames from 'classnames';
-import _ from 'lodash';
-// import * as d3 from 'd3';
 
 import './style.scss';
 
@@ -85,7 +83,9 @@ class Popup extends React.PureComponent {
 		if (width > maxWidth) {
 			width = maxWidth;
 		}
-		return style;
+		return element && element.offsetWidth !== 0 && element.offsetHeight !== 0
+			? {...style}
+			: {...style, position: 'absolute', overfloat: 'auto'};
 	}
 
 	componentDidMount() {
