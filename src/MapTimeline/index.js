@@ -10,9 +10,27 @@ import './style.scss';
 
 const CONTROLS_WIDTH = 0;
 
-const getOverlaysCfg = (layers = []) => {
+const getOverlayCfg = options => {
+	const otherOptions = options.options || {};
+	return {
+		key: options.key,
+		layerTemplateKey: options.layerTemplateKey,
+		start: moment(options.period.start),
+		end: moment(options.period.end),
+		backdroundColor: options.backdroundColor,
+		hideLabel: options.hideLabel,
+		height: options.height,
+		top: options.top,
+		options: {
+			...otherOptions,
+		},
+	};
+};
+
+const getOverlaysCfg = layers => {
 	const LINEHEIGHT = 1;
 	const ROWHEIGHT = 0.6; //in rem
+	let line = 0;
 	let PADDING = (LINEHEIGHT - ROWHEIGHT) / 2;
 	layers.sort((a, b) => a.zIndex - b.zIndex);
 
@@ -20,48 +38,60 @@ const getOverlaysCfg = (layers = []) => {
 	let top = PADDING;
 	return layers.reduce((acc, layerCfg) => {
 		if (lastZIndex !== layerCfg.zIndex) {
+			line = line + 1;
 			lastZIndex = layerCfg.zIndex;
 			//todo rem
-			top = LINEHEIGHT + PADDING;
+			// fixme
+			top = line * LINEHEIGHT + PADDING;
+			console.log('xxx lastZIndex', lastZIndex, top);
 		}
-
-		if (layerCfg && layerCfg.period && layerCfg.period.length) {
+		if (layerCfg && layerCfg.period && layerCfg.period.length > 0) {
+			const otherOptions = layerCfg.options || {};
 			const cfgs = layerCfg.period.map((period, index) => {
-				const cfg = {
-					key: `${layerCfg.key}-${index}`,
+				return getOverlayCfg({
+					key: `${layerCfg.layerTemplateKey}-${index}`,
 					layerTemplateKey: layerCfg.layerTemplateKey,
-					periodIndex: index,
-					start: moment(period.start),
-					end: moment(period.end),
+					period: period,
 					backdroundColor:
-						layerCfg.active && layerCfg.activePeriodIndex === index
+						layerCfg.active && otherOptions.activePeriodIndex === index
 							? layerCfg.activeColor
 							: layerCfg.color,
 					hideLabel: true,
-					// classes: 'overlay5',
 					height: ROWHEIGHT * utils.getRemSize(),
 					top: top * utils.getRemSize(),
-				};
-				return cfg;
+					options: {
+						...otherOptions,
+						periodIndex: index,
+					},
+				});
 			});
 			return [...acc, ...cfgs];
-		} else {
-			const cfg = {
-				key: layerCfg.key,
+		} else if (
+			layerCfg.period &&
+			layerCfg.period.start &&
+			layerCfg.period.end
+		) {
+			const otherOptions = layerCfg.options || {};
+			const cfg = getOverlayCfg({
+				key: layerCfg.layerTemplateKey,
 				layerTemplateKey: layerCfg.layerTemplateKey,
-				start: moment(layerCfg.period.start),
-				end: moment(layerCfg.period.end),
+				period: layerCfg.period,
 				backdroundColor: layerCfg.active
 					? layerCfg.activeColor
 					: layerCfg.color,
 				label: layerCfg.title,
 				hideLabel: true,
-				// classes: 'overlay5',
 				height: ROWHEIGHT * utils.getRemSize(),
 				top: top * utils.getRemSize(),
-			};
+				options: {
+					// classes: 'overlay5',
+					...otherOptions,
+				},
+			});
 
 			return [...acc, cfg];
+		} else {
+			return acc;
 		}
 	}, []);
 };
@@ -115,6 +145,23 @@ class MapTimeline extends React.PureComponent {
 		legend: false,
 	};
 
+	getZIndexCount(layers) {
+		const sortedLayers = [...layers].sort((a, b) => a.zIndex - b.zIndex);
+
+		//merge layers on same level
+		let lastZIndex = -1;
+		const layersCount = sortedLayers.reduce((acc, layer) => {
+			if (lastZIndex < layer.zIndex) {
+				lastZIndex = layer.zIndex;
+				return acc + 1;
+			} else {
+				return acc;
+			}
+		}, 0);
+
+		return layersCount;
+	}
+
 	render() {
 		const {
 			levels,
@@ -133,7 +180,8 @@ class MapTimeline extends React.PureComponent {
 		} = this.props;
 
 		const overlays = getOverlaysCfg(layers);
-		const contentHeightByLayers = (layers.length + 1) * utils.getRemSize();
+		const contentHeightByLayers =
+			(this.getZIndexCount(layers) + 1) * utils.getRemSize();
 		const childArray = React.Children.toArray(children);
 		childArray.push(
 			<Overlay key={'layers'} overlays={overlays} onClick={onLayerClick} />

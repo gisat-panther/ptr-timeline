@@ -10,11 +10,14 @@
 	// uncomment
 	// line-height: $a1;
 	// font-size: $a1;
-	max-width: 10rem;
+	line-height: 1rem;
+	font-size: 1rem;
+	max-width: 14rem;
 }
 .ptr-maptimelinelegend span {
 	// uncomment
-	// padding: 0 $a1;
+	// padding: 0 $a;
+	padding: 0 1rem;
 }
 
 .ptr-maptimeline-legenditem {
