@@ -17,6 +17,8 @@ const getOverlayCfg = options => {
 		layerTemplateKey: options.layerTemplateKey,
 		start: moment(options.period.start),
 		end: moment(options.period.end),
+		period: options.period,
+		periodIndex: options.periodIndex,
 		backdroundColor: options.backdroundColor,
 		hideLabel: options.hideLabel,
 		height: options.height,
@@ -43,17 +45,17 @@ const getOverlaysCfg = layers => {
 			//todo rem
 			// fixme
 			top = line * LINEHEIGHT + PADDING;
-			console.log('xxx lastZIndex', lastZIndex, top);
 		}
 		if (layerCfg && layerCfg.period && layerCfg.period.length > 0) {
 			const otherOptions = layerCfg.options || {};
 			const cfgs = layerCfg.period.map((period, index) => {
 				return getOverlayCfg({
-					key: `${layerCfg.layerTemplateKey}-${index}`,
+					key: `${layerCfg.key}-${index}`,
 					layerTemplateKey: layerCfg.layerTemplateKey,
 					period: period,
+					periodIndex: index,
 					backdroundColor:
-						layerCfg.active && otherOptions.activePeriodIndex === index
+						layerCfg.active && layerCfg.activePeriodIndex === index
 							? layerCfg.activeColor
 							: layerCfg.color,
 					hideLabel: true,
@@ -61,7 +63,6 @@ const getOverlaysCfg = layers => {
 					top: top * utils.getRemSize(),
 					options: {
 						...otherOptions,
-						periodIndex: index,
 					},
 				});
 			});
@@ -73,9 +74,10 @@ const getOverlaysCfg = layers => {
 		) {
 			const otherOptions = layerCfg.options || {};
 			const cfg = getOverlayCfg({
-				key: layerCfg.layerTemplateKey,
+				key: layerCfg.key,
 				layerTemplateKey: layerCfg.layerTemplateKey,
 				period: layerCfg.period,
+				periodIndex: 0,
 				backdroundColor: layerCfg.active
 					? layerCfg.activeColor
 					: layerCfg.color,
