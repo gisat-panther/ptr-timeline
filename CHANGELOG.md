@@ -1,3 +1,16 @@
+# v0.0.7 (Fri Sep 03 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Merge branch 'master' of github.com:gisat-panther/ptr-timeline ([@vdubr](https://github.com/vdubr))
+- Fix layerPeriodIndex and layerkey ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.6 (Thu Sep 02 2021)
 
 #### ⚠️ Pushed to `master`
