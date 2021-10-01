@@ -56,7 +56,7 @@ class Popup extends React.PureComponent {
 		const maxWidth = maxX - 20;
 		const maxHeight = maxY - minY - 20;
 
-		const element = this.ref.current && this.ref.current.children[0];
+		const element = this.ref.current;
 		let width = element && element.offsetWidth ? element.offsetWidth : WIDTH;
 		let height =
 			element && element.offsetHeight ? element.offsetHeight : HEIGHT;
@@ -108,12 +108,10 @@ class Popup extends React.PureComponent {
 		}
 
 		return (
-			<div ref={this.ref} className={classes}>
-				<div style={style} className={classes}>
-					{this.props.content
-						? React.cloneElement(this.props.content)
-						: this.props.children}
-				</div>
+			<div ref={this.ref} style={style} className={classes}>
+				{this.props.content
+					? React.cloneElement(this.props.content)
+					: this.props.children}
 			</div>
 		);
 	}
