@@ -1,3 +1,15 @@
+# v0.0.8 (Fri Oct 01 2021)
+
+#### 🐾 Patch
+
+- Fix diplicated tooltip element [#6](https://github.com/gisat-panther/ptr-timeline/pull/6) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.7 (Fri Sep 03 2021)
 
 #### ⚠️ Pushed to `master`
