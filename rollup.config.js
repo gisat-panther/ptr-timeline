@@ -19,7 +19,7 @@ Object.assign(Paths, {
 	OUTPUT: Paths.DIST + '/index.js',
 });
 
-const lodashExternal = ['lodash/map'];
+const lodashExternal = ['lodash/map', 'lodash/isEmpty'];
 
 const onwarn = warning => {
 	// throw on others
@@ -31,7 +31,14 @@ const onwarn = warning => {
 export default {
 	input: 'src/index.js',
 	onwarn,
-	external: ['react', 'prop-types', 'moment', ...lodashExternal],
+	external: [
+		'react-resize-detector',
+		'react',
+		'classnames',
+		'prop-types',
+		'moment',
+		...lodashExternal,
+	],
 	output: {
 		file: {
 			es: pkg.module,
