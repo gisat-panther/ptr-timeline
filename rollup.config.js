@@ -37,6 +37,7 @@ export default {
 		'classnames',
 		'prop-types',
 		'moment',
+		/@babel\/runtime/,
 		...lodashExternal,
 	],
 	output: {
@@ -54,6 +55,7 @@ export default {
 	plugins: [
 		babel({
 			plugins: ['lodash'],
+			babelHelpers: 'runtime',
 		}),
 		commonjs({
 			include: 'node_modules/**',
