@@ -1,3 +1,15 @@
+# v0.0.9 (Tue Oct 12 2021)
+
+#### 🐾 Patch
+
+- Fix ssr rendering, tooltip positioning and build process [#7](https://github.com/gisat-panther/ptr-timeline/pull/7) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.0.8 (Fri Oct 01 2021)
 
 #### 🐾 Patch
