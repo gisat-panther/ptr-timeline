@@ -357,33 +357,35 @@ class Timeline extends React.PureComponent {
 			this.getXAxisWidth()
 		);
 		return (
-			<ContextProvider
-				value={{
-					updateContext: this.updateContext,
-					width: this.getXAxisWidth(),
-					height: this.getContentHeight(),
-					getX: this.getX,
-					getTime: this.getTime,
-					centerTime: this.state.centerTime,
-					getActiveLevel: this.getActiveLevel,
-					dayWidth,
-					maxDayWidth,
-					minDayWidth,
-					periodLimit,
-					period,
-					mouseX,
-					activeLevel,
-					periodLimitVisible: true,
-					onClick,
-					onHover,
-					vertical,
-					periodLimitOnCenter,
-					selectMode,
-					moving,
-				}}
-			>
-				<TimelineContent>{children}</TimelineContent>
-			</ContextProvider>
+			<div>
+				<ContextProvider
+					value={{
+						updateContext: this.updateContext,
+						width: this.getXAxisWidth(),
+						height: this.getContentHeight(),
+						getX: this.getX,
+						getTime: this.getTime,
+						centerTime: this.state.centerTime,
+						getActiveLevel: this.getActiveLevel,
+						dayWidth,
+						maxDayWidth,
+						minDayWidth,
+						periodLimit,
+						period,
+						mouseX,
+						activeLevel,
+						periodLimitVisible: true,
+						onClick,
+						onHover,
+						vertical,
+						periodLimitOnCenter,
+						selectMode,
+						moving,
+					}}
+				>
+					<TimelineContent>{children}</TimelineContent>
+				</ContextProvider>
+			</div>
 		);
 	}
 }

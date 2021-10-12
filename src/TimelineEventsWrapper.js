@@ -706,14 +706,18 @@ class TimelineEventsWrapper extends React.PureComponent {
  * @see http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
  */
 const requestAnimFrame = (function () {
-	return (
-		window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame ||
-		function (callback) {
-			window.setTimeout(callback, 1000 / 60);
-		}
-	);
+	if (typeof window !== 'undefined') {
+		return (
+			window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			function (callback) {
+				window.setTimeout(callback, 1000 / 60);
+			}
+		);
+	} else {
+		return null;
+	}
 })();
 
 export default TimelineEventsWrapper;
