@@ -1,3 +1,15 @@
+# v0.1.1 (Mon Nov 15 2021)
+
+#### 🐾 Patch
+
+- Pass hovered timeline Y coords to the hoverHandler [#9](https://github.com/gisat-panther/ptr-timeline/pull/9) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.0 (Tue Oct 12 2021)
 
 #### 🚀 Enhancement
