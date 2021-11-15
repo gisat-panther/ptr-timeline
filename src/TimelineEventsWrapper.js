@@ -29,6 +29,33 @@ const getPageXFromEvent = (evt, vertical = false, targetBoudingBox) => {
 	return clientX;
 };
 
+/**
+ *
+ * @param {Event} evt
+ * @param {boolean} vertical
+ */
+const getPageYFromEvent = (evt, vertical = false, targetBoudingBox) => {
+	let clientY;
+	const touch =
+		(evt.touches && evt.touches[0]) ||
+		(evt.changedTouches && evt.changedTouches[0]);
+	const scrollLeft = window.document.documentElement.scrollLeft;
+	const scrollTop = window.document.documentElement.scrollTop;
+	if (touch) {
+		clientY = vertical ? touch.pageX - scrollTop : touch.pageY - scrollLeft;
+	} else {
+		clientY = vertical ? evt.pageX - scrollTop : evt.pageY - scrollLeft;
+	}
+
+	if (vertical) {
+		clientY = clientY - targetBoudingBox.left; //y position within the element.
+	} else {
+		clientY = clientY - targetBoudingBox.top; //y position within the element.
+	}
+
+	return clientY;
+};
+
 const calculateEventDistance = (point1, point2) => {
 	return Math.hypot(
 		point1.clientX - point2.clientX,
@@ -319,10 +346,17 @@ class TimelineEventsWrapper extends React.PureComponent {
 			vertical,
 			this.node.current.getBoundingClientRect()
 		);
+		const clientY = getPageYFromEvent(
+			e,
+			vertical,
+			this.node.current.getBoundingClientRect()
+		);
 
 		onHover({
 			x: e.pageX,
 			y: e.pageY,
+			clientX,
+			clientY,
 			time: getTime(clientX),
 			dayWidth,
 			vertical: vertical,
