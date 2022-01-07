@@ -1,37 +1,61 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import {isNumber as _isNumber} from 'lodash';
+import {stateManagement} from '@gisatcz/ptr-utils';
 
 import HoverContext from './context';
 import Popup from './Popup/Popup';
 
-class HoverHandler extends React.PureComponent {
-	static propTypes = {
-		getStyle: PropTypes.func,
-		selectedItems: PropTypes.array,
-		compressedPopups: PropTypes.bool,
-		popupContentComponent: PropTypes.oneOfType([
-			PropTypes.element,
-			PropTypes.func,
-		]),
+const HoverHandler = ({
+	children,
+	getStyle,
+	popupContentComponent,
+	compressedPopups,
+}) => {
+	const [state, setState] = useState({
+		hoveredItems: [],
+		popupContent: null,
+		x: null,
+		y: null,
+		data: null,
+	});
+	const ref = useRef();
+	const tmpHoveredItems = useRef([]);
+
+	const onHoverOut = hoveredItemsToRemove => {
+		let updateHoveredItems = tmpHoveredItems.current || [];
+
+		if (hoveredItemsToRemove?.length > 0) {
+			// remove hoveredItems from context
+
+			hoveredItemsToRemove.forEach(overlay => {
+				const hoverdItemIndex = updateHoveredItems.findIndex(
+					i => i?.key === overlay.key
+				);
+				if (_isNumber(hoverdItemIndex)) {
+					updateHoveredItems = stateManagement.removeItemByIndex(
+						updateHoveredItems,
+						hoverdItemIndex
+					);
+				}
+			});
+		} else {
+			// else clear all hoveredItems
+			updateHoveredItems = [];
+		}
+
+		tmpHoveredItems.current = updateHoveredItems;
+		setState(prevState => ({
+			...prevState,
+			...{
+				popupContent: null,
+				data: null,
+				fidColumnName: null,
+			},
+		}));
 	};
 
-	constructor(props) {
-		super(props);
-		this.ref = React.createRef();
-		this.state = {
-			hoveredItems: [],
-			popupContent: null,
-			x: null,
-			y: null,
-			data: null,
-		};
-
-		this.onHover = this.onHover.bind(this);
-		this.onHoverOut = this.onHoverOut.bind(this);
-	}
-
-	onHover(hoveredItems, options) {
+	const onHover = (newHoveredItems = [], options) => {
 		// TODO what is wrong with attributes? Just bad signal? Else try single layer
 
 		// TODO check popup coordinates -> if the same -> merge data / else -> overwrite
@@ -51,10 +75,7 @@ class HoverHandler extends React.PureComponent {
 
 		// check if coordinates has been changed
 		if (options.popup.x && options.popup.y) {
-			if (
-				this.state.x !== options.popup.x ||
-				this.state.y !== options.popup.y
-			) {
+			if (state.x !== options.popup.x || state.y !== options.popup.y) {
 				coordChanged = true;
 				update.x = options.popup.x;
 				update.y = options.popup.y;
@@ -63,63 +84,34 @@ class HoverHandler extends React.PureComponent {
 
 		// handle data according to coordinates change
 		// TODO fid column name should be part of data
+		const hoveredItemsKeys =
+			newHoveredItems.map(i => i?.key).filter(i => i) || [];
+		const stateHoveredItemWithoutByKey = tmpHoveredItems.current?.filter(
+			i => !hoveredItemsKeys.includes(i?.key)
+		);
+
 		if (coordChanged) {
-			update.hoveredItems = hoveredItems;
 			update.data = options.popup.data;
 			update.fidColumnName = options.popup.fidColumnName;
 		} else {
-			update.hoveredItems = [...this.state.hoveredItems, ...hoveredItems];
-			if (this.state.data && options.popup.data && options.popup.data.length) {
-				update.data = [...this.state.data, ...options.popup.data];
+			if (state.data && options.popup.data && options.popup.data.length) {
+				update.data = [...state.data, ...options.popup.data];
 				update.fidColumnName = options.popup.fidColumnName;
 			}
 		}
 
+		tmpHoveredItems.current = [
+			...stateHoveredItemWithoutByKey,
+			...newHoveredItems,
+		];
+
 		if (!_.isEmpty(update)) {
-			if (update.hoveredItems && update.hoveredItems.length) {
-				this.setState(update);
-			} else {
-				this.onHoverOut();
-			}
+			setState(prevState => ({...prevState, ...update}));
 		}
-	}
+	};
 
-	onHoverOut() {
-		this.setState({
-			hoveredItems: [],
-			popupContent: null,
-			data: null,
-			fidColumnName: null,
-		});
-	}
-
-	render() {
-		const {children, selectedItems} = this.props;
-		const {hoveredItems, popupContent, data, x, y} = this.state;
-
-		return (
-			<HoverContext.Provider
-				value={{
-					hoveredItems: hoveredItems,
-					selectedItems: selectedItems,
-					onHover: this.onHover,
-					onHoverOut: this.onHoverOut,
-					x: x,
-					y: y,
-				}}
-			>
-				<div ref={this.ref} style={{height: '100%', width: '100%'}}>
-					{children}
-					{/* {popup ? this.renderPopup() : null} */}
-					{popupContent || data ? this.renderPopup() : null}
-				</div>
-			</HoverContext.Provider>
-		);
-	}
-
-	renderPopup() {
-		const {getStyle, popupContentComponent, compressedPopups} = this.props;
-		const {data, hoveredItems, fidColumnName, popupContent, x, y} = this.state;
+	const renderPopup = () => {
+		const {data, hoveredItems, fidColumnName, popupContent, x, y} = state;
 
 		return (
 			<Popup
@@ -135,28 +127,30 @@ class HoverHandler extends React.PureComponent {
 						: popupContent
 				}
 				getStyle={getStyle}
-				hoveredElemen={this.ref.current}
+				hoveredElemen={ref.current}
 				compressed={compressedPopups}
 			/>
 		);
-	}
+	};
 
-	renderPopupContent() {
-		const comp = this.props.popupContentComponent;
-		if (React.isValidElement(comp)) {
-			return React.cloneElement(comp, {
-				data: this.state.data,
-				featureKeys: this.state.hoveredItems,
-				fidColumnName: this.state.fidColumnName,
-			});
-		} else {
-			return React.createElement(comp, {
-				data: this.state.data,
-				featureKeys: this.state.hoveredItems,
-				fidColumnName: this.state.fidColumnName,
-			});
-		}
-	}
-}
+	return (
+		<HoverContext.Provider
+			value={{
+				hoveredItems: tmpHoveredItems.current,
+				selectedItems: state.selectedItems,
+				onHover: onHover,
+				onHoverOut: onHoverOut,
+				x: state.x,
+				y: state.y,
+			}}
+		>
+			<div ref={ref} style={{height: '100%', width: '100%'}}>
+				{children}
+				{/* {popup ? this.renderPopup() : null} */}
+				{state.popupContent || state.data ? renderPopup() : null}
+			</div>
+		</HoverContext.Provider>
+	);
+};
 
 export default HoverHandler;
