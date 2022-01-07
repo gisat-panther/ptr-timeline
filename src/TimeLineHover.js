@@ -11,12 +11,18 @@ class TimelineHover extends React.PureComponent {
 
 	onHover(evt) {
 		const popupContent =
-			(evt && this.props.getHoverContent(evt.x, evt.time, evt)) || null;
+			(evt && this.props.getHoverContent(evt.x, evt.time, evt, this.context)) ||
+			null;
 		if (
 			popupContent &&
 			(React.isValidElement(popupContent) || popupContent?.popup?.content)
 		) {
-			this.context.onHover(['timeline'], {
+			const hoverItem = {
+				key: 'timeline',
+				x: evt.x,
+				y: evt.y,
+			};
+			this.context.onHover([hoverItem], {
 				popup: {
 					x: evt.x,
 					y: evt.y,

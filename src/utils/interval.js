@@ -186,6 +186,7 @@ export const getOverlays = (periodStart, periodEnd, overlays) => {
 				backgound: overlay.backdroundColor,
 				start: start.isBefore(periodLimitStart) ? periodLimitStart : start,
 				end: end.isAfter(periodLimitEnd) ? periodLimitEnd : end,
+				origin: overlay,
 			});
 		}
 	}
