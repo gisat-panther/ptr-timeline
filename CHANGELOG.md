@@ -1,3 +1,15 @@
+# v0.1.2 (Fri Jan 07 2022)
+
+#### 🐾 Patch
+
+- Update HoverHandler to pass in params to the getHoverContent info abo… [#13](https://github.com/gisat-panther/ptr-timeline/pull/13) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.1 (Mon Nov 15 2021)
 
 #### 🐾 Patch
