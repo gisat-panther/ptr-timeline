@@ -117,6 +117,10 @@ class Timeline extends React.PureComponent {
 			this.updateContext({period, centerTime: time});
 		}
 
+		if (prevProps.periodLimit !== periodLimit) {
+			this.updateContext({period: periodLimit});
+		}
+
 		//if parent component set time
 		if (prevProps.width !== width || prevProps.height !== height) {
 			//přepočítat day width aby bylo v periodě
