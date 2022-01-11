@@ -1,3 +1,15 @@
+# v0.1.3 (Tue Jan 11 2022)
+
+#### 🐾 Patch
+
+- If new props periodLimit, then change timeline [#15](https://github.com/gisat-panther/ptr-timeline/pull/15) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.2 (Fri Jan 07 2022)
 
 #### 🐾 Patch
