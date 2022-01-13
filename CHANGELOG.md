@@ -1,3 +1,15 @@
+# v0.1.4 (Thu Jan 13 2022)
+
+#### 🐾 Patch
+
+- Set legend elements height [#16](https://github.com/gisat-panther/ptr-timeline/pull/16) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.3 (Tue Jan 11 2022)
 
 #### 🐾 Patch
