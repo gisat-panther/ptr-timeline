@@ -45,7 +45,7 @@ const TimelineContent = ({children, ...propsWithoutChildren}) => {
 
 	return (
 		<TimelineEventsWrapper>
-			<div className="ptr-timeline-content">
+			<div className="ptr-timeline-content" style={{height: elementHeight}}>
 				<svg
 					version={'1.1'}
 					xmlns={'http://www.w3.org/2000/svg'}
