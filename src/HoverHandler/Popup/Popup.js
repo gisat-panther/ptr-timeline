@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 import {getTootlipPosition} from '../position';
 import classnames from 'classnames';
@@ -30,53 +30,42 @@ const getTooltipStyle = () => {
 	);
 };
 
-class Popup extends React.PureComponent {
-	static propTypes = {
-		x: PropTypes.number,
-		y: PropTypes.number,
-		maxX: PropTypes.number,
-		content: PropTypes.element,
-		getStyle: PropTypes.func,
-		hoveredElemen: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-		compressed: PropTypes.bool,
-	};
+const Popup = ({
+	x,
+	y,
+	maxX,
+	content,
+	getStyle,
+	hoveredElemen,
+	compressed,
+	children,
+}) => {
+	const ref = useRef();
 
-	constructor(props) {
-		super(props);
-
-		this.ref = React.createRef();
-	}
-
-	getStyle() {
-		let posX = this.props.x;
-		let posY = this.props.y;
+	const getPopupStyle = () => {
+		let posX = x;
+		let posY = y;
 		let maxX = window.innerWidth;
 		let maxY = window.innerHeight + window.pageYOffset;
 		let minY = window.pageYOffset;
 		const maxWidth = maxX - 20;
 		const maxHeight = maxY - minY - 20;
 
-		const element = this.ref.current;
+		const element = ref.current;
 		let width = element && element.offsetWidth ? element.offsetWidth : WIDTH;
 		let height =
 			element && element.offsetHeight ? element.offsetHeight : HEIGHT;
 
 		let style = null;
 
-		if (typeof this.props.getStyle === 'function' && this.props.hoveredElemen) {
-			style = this.props.getStyle()(
-				posX,
-				posY,
-				width,
-				height,
-				this.props.hoveredElemen
-			);
+		if (typeof getStyle === 'function' && hoveredElemen) {
+			style = getStyle()(posX, posY, width, height, hoveredElemen);
 		} else {
 			//right corner on mouse position
 			style = getTooltipStyle()(posX, posY, width, height);
 		}
 
-		if (this.props.compressed || height > maxHeight) {
+		if (compressed || height > maxHeight) {
 			width = 500;
 		}
 
@@ -85,36 +74,46 @@ class Popup extends React.PureComponent {
 		}
 		return element && element.offsetWidth !== 0 && element.offsetHeight !== 0
 			? {...style}
-			: {...style, position: 'absolute', overfloat: 'auto'};
+			: {
+					...style,
+					position: 'absolute',
+					overfloat: 'auto',
+			  };
+	};
+
+	// Is it needed???
+	// componentDidMount() {
+	// 	if (true && ref && ref.current) {
+	// 		const style = getPopupStyle();
+	// 		ref.current.style = style;
+	// 	}
+	// }
+
+	const style = getPopupStyle();
+
+	let classes = classnames('ptr-popup', {
+		compressed: compressed,
+	});
+
+	if (ref && !ref.current) {
+		style.display = 'none';
 	}
 
-	componentDidMount() {
-		// autofocus the input on mount
-		if (true && this.ref && this.ref.current) {
-			const style = this.getStyle();
-			this.ref.current.style = style;
-		}
-	}
+	return (
+		<div ref={ref} style={{...style}} className={classes}>
+			{content ? React.cloneElement(content) : children}
+		</div>
+	);
+};
 
-	render() {
-		const style = this.getStyle();
-
-		let classes = classnames('ptr-popup', {
-			compressed: this.props.compressed,
-		});
-
-		if (this.ref && !this.ref.current) {
-			style.display = 'none';
-		}
-
-		return (
-			<div ref={this.ref} style={style} className={classes}>
-				{this.props.content
-					? React.cloneElement(this.props.content)
-					: this.props.children}
-			</div>
-		);
-	}
-}
+Popup.prototype = {
+	x: PropTypes.number,
+	y: PropTypes.number,
+	maxX: PropTypes.number,
+	content: PropTypes.element,
+	getStyle: PropTypes.func,
+	hoveredElemen: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+	compressed: PropTypes.bool,
+};
 
 export default Popup;

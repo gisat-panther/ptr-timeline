@@ -1,17 +1,9 @@
 @import '~@gisatcz/ptr-core/lib/styles/_variables';
 
-g.ptr-timeline-year,
-.ptr-timeline-year > line {
-	stroke-width: 1;
-	stroke: var(--accent20);
-	fill: var(--base10);
-}
-
 .ptr-timeline-year-label {
 	stroke: none;
 	fill: var(--accent30);
 	font-size: 0.85rem;
-	font-weight: bold;
 }
 
 .ptr-timeline-year.background > line {

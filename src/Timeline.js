@@ -361,7 +361,7 @@ class Timeline extends React.PureComponent {
 			this.getXAxisWidth()
 		);
 		return (
-			<div>
+			<div className="ptr-timeline">
 				<ContextProvider
 					value={{
 						updateContext: this.updateContext,

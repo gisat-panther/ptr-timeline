@@ -1,0 +1,11 @@
+@import '~@gisatcz/ptr-core/lib/styles/_variables';
+
+.ptr-timeline-month-label {
+	stroke: none;
+	fill: var(--accent30);
+	font-size: $a0;
+}
+
+.ptr-timeline-month.background > line {
+	stroke: rgba(0, 0, 0, 0.2);
+}

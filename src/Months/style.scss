@@ -1,12 +1,23 @@
+@import '~@gisatcz/ptr-core/lib/styles/_variables';
+
+g.ptr-timeline-month,
 .ptr-timeline-month > line {
 	stroke-width: 1;
-	stroke: rgba(0, 0, 0, 0.6);
+	stroke: var(--accent20);
+	fill: var(--base10);
 }
+
 .ptr-timeline-month-label {
-	font-size: 0.8rem;
-	fill: rgba(0, 0, 0, 0.6);
+	stroke: none;
+	fill: var(--accent30);
+	font-size: $a0;
 }
 
 .ptr-timeline-month.background > line {
 	stroke: rgba(0, 0, 0, 0.2);
+}
+
+g.ptr-timeline-month.secondary > line {
+	stroke: var(--accent20);
+	stroke-dasharray: 2 4;
 }

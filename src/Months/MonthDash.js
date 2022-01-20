@@ -1,22 +1,29 @@
 import React from 'react';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import {D1, D2} from '../utils/dash';
-
+import utils from '../utils';
 const MonthDash = props => {
-	const {x, label, vertical, height} = props;
+	const {x, label, vertical, height, secondary} = props;
+
+	const classes = classnames('ptr-timeline-month', {
+		secondary,
+	});
+
 	return (
-		<g className={'ptr-timeline-month'}>
-			{height === 2 ? <D2 x={x} vertical={vertical} /> : null}
-			{height === 1 ? <D1 x={x} vertical={vertical} /> : null}
+		<g className={classes}>
+			{/* {height === 2 ? React.createElement(utils.dash.D2, {x,vertical}) : null} */}
+			{/* {height === 1 ? React.createElement(utils.dash.D1, {x,vertical}) : null} */}
+			{React.createElement(utils.dash.D1, {x, vertical})}
 			{label}
 		</g>
 	);
 };
 
 MonthDash.propTypes = {
-	x: PropTypes.number.isRequired,
+	x: PropTypes.number,
 	label: PropTypes.element,
 	vertical: PropTypes.bool,
+	secondary: PropTypes.bool,
 };
 
 MonthDash.defaultProps = {

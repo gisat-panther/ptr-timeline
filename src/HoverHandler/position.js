@@ -11,7 +11,7 @@ const getAbsoluteElementPosition = element => {
 };
 
 //top
-const getTopPossition = (
+const getTopPosition = (
 	origPosX,
 	origPosY,
 	width,
@@ -66,7 +66,7 @@ const getTopPossition = (
 };
 
 //bottom
-const getBottomPossition = (
+const getBottomPosition = (
 	origPosX,
 	origPosY,
 	width,
@@ -120,7 +120,7 @@ const getBottomPossition = (
 };
 
 //right
-const getRightPossition = (
+const getRightPosition = (
 	origPosX,
 	origPosY,
 	width,
@@ -170,7 +170,7 @@ const getRightPossition = (
 };
 
 //left
-const getLeftPossition = (
+const getLeftPosition = (
 	origPosX,
 	origPosY,
 	width,
@@ -240,7 +240,7 @@ const getTootlipPosition = (referencePoint, positions, BBox, padding) => {
 		let pos = null;
 		switch (position) {
 			case 'top':
-				const topPos = getTopPossition(
+				const topPos = getTopPosition(
 					origPosX,
 					origPosY,
 					width,
@@ -257,7 +257,7 @@ const getTootlipPosition = (referencePoint, positions, BBox, padding) => {
 				};
 				break;
 			case 'bottom':
-				const bottomPos = getBottomPossition(
+				const bottomPos = getBottomPosition(
 					origPosX,
 					origPosY,
 					width,
@@ -278,7 +278,7 @@ const getTootlipPosition = (referencePoint, positions, BBox, padding) => {
 				};
 				break;
 			case 'left':
-				const leftPos = getLeftPossition(
+				const leftPos = getLeftPosition(
 					origPosX,
 					origPosY,
 					width,
@@ -295,7 +295,7 @@ const getTootlipPosition = (referencePoint, positions, BBox, padding) => {
 				};
 				break;
 			case 'right':
-				const rightPos = getRightPossition(
+				const rightPos = getRightPosition(
 					origPosX,
 					origPosY,
 					width,

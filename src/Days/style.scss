@@ -1,17 +1,18 @@
-.ptr-timeline-day {
+@import '~@gisatcz/ptr-core/lib/styles/_variables';
+
+g.ptr-timeline-day,
+.ptr-timeline-day > line {
 	stroke-width: 1;
-	stroke: rgba(0, 0, 0, 0.2);
+	stroke: var(--accent20);
+	fill: var(--base10);
 }
-.ptr-timeline-day.Monday {
-	stroke: rgba(0, 0, 0, 0.3);
-}
-.ptr-timeline-day.background {
-	stroke: rgba(0, 0, 0, 0.07);
-}
-.ptr-timeline-day.background.Monday {
-	stroke: rgba(0, 0, 0, 0.1);
-}
+
 .ptr-timeline-day-label {
-	font-size: 0.7rem;
-	fill: rgba(0, 0, 0, 0.4);
+	stroke: none;
+	fill: var(--accent30);
+	font-size: 0.85rem;
+}
+
+.ptr-timeline-day.background > line {
+	stroke: rgba(0, 0, 0, 0.2);
 }
