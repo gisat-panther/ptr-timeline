@@ -1,42 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-class MapTimelineLegand extends React.PureComponent {
-	static propTypes = {
-		layers: PropTypes.array, //which layers display in timeline
-	};
 
-	static defaultProps = {
-		layers: [],
-	};
+import {utils} from '@gisatcz/ptr-utils';
 
-	render() {
-		const {layers} = this.props;
+const defaultLineHeight = utils.getRemSize();
 
-		layers.sort((a, b) => a.zIndex - b.zIndex);
+const MapTimelineLegend = ({layers, lineHeight = defaultLineHeight}) => {
+	const layersElms =
+		layers?.map(layer => {
+			return (
+				<span
+					key={layer.key || layer?.legend?.title}
+					className={'ptr-maptimeline-legenditem'}
+					style={{lineHeight: `${lineHeight}px`}}
+					title={`${layer.legend.title}`}
+				>
+					{layer.legend.title}
+				</span>
+			);
+		}) || [];
 
-		//merge layers on same level
-		let lastZIndex = -1;
-		const layersElms = layers.reduce((acc, layer) => {
-			if (lastZIndex < layer.zIndex) {
-				lastZIndex = layer.zIndex;
-				// return [...acc, <span key={layer.layerTemplateKey} className={'ptr-maptimeline-legenditem'} title={`${layer.title} ${layer.info}`}>{layer.title}</span>];
-				//version without info
-				return [
-					...acc,
-					<span
-						key={layer.key}
-						className={'ptr-maptimeline-legenditem'}
-						title={`${layer.title}`}
-					>
-						{layer.title}
-					</span>,
-				];
-			} else {
-				return acc;
-			}
-		}, []);
-		return <div className={'ptr-maptimelinelegend'}>{layersElms}</div>;
-	}
-}
+	return <div className={'ptr-maptimelinelegend'}>{layersElms}</div>;
+};
 
-export default MapTimelineLegand;
+export default MapTimelineLegend;

@@ -1,9 +1,18 @@
-.ptr-timeline-hour {
+@import '~@gisatcz/ptr-core/lib/styles/_variables';
+
+g.ptr-timeline-hour,
+.ptr-timeline-hour > line {
 	stroke-width: 1;
-	stroke: rgba(0, 0, 0, 0.2);
+	stroke: var(--accent20);
+	fill: var(--base10);
 }
 
 .ptr-timeline-hour-label {
-	font-size: 0.7rem;
-	fill: rgba(0, 0, 0, 0.4);
+	stroke: none;
+	fill: var(--accent30);
+	font-size: 0.85rem;
+}
+
+.ptr-timeline-hour.background > line {
+	stroke: rgba(0, 0, 0, 0.2);
 }

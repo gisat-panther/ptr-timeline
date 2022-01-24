@@ -2,3 +2,11 @@
 	font-size: 0.8rem;
 	fill: rgba(220, 220, 220, 0.9);
 }
+
+.ptr-timeline-overlay rect {
+	cursor: pointer;
+}
+
+.ptr-timeline-overlay text {
+	cursor: pointer;
+}

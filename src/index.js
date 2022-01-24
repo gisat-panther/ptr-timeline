@@ -5,7 +5,9 @@ import Overlay from './Overlay';
 import CenterPicker from './CenterPicker';
 import Mouse from './Mouse';
 import Years from './Years';
+import YearsLabels from './YearsLabels';
 import Months from './Months';
+import MonthsLabels from './MonthsLabels';
 import TimeLineHover from './TimeLineHover';
 import HoverHandler from './HoverHandler/HoverHandler';
 import * as position from './HoverHandler/position';
@@ -20,6 +22,8 @@ export {
 	CenterPicker,
 	Mouse,
 	Years,
+	YearsLabels,
+	MonthsLabels,
 	Months,
 	TimeLineHover,
 	utils,
