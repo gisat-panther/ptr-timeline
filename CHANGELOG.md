@@ -1,3 +1,15 @@
+# v0.1.5 (Mon Jan 24 2022)
+
+#### 🐾 Patch
+
+- Import next styles to better independency [#18](https://github.com/gisat-panther/ptr-timeline/pull/18) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.4 (Thu Jan 13 2022)
 
 #### 🐾 Patch
