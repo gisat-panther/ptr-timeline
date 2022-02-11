@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import {map as _map} from 'lodash';
 import moment from 'moment';
@@ -8,7 +7,7 @@ import YearDash from '../Years/YearDash';
 import './style.scss';
 
 const Months = props => {
-	const {period, getX, dayWidth, height, vertical} = props;
+	const {period, getX, vertical} = props;
 	const periodStart = moment(period.start);
 	const periodEnd = moment(period.end);
 	const monthsCfg = utils.interval.getMonths(periodStart, periodEnd);

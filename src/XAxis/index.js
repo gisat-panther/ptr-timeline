@@ -1,4 +1,5 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import {createElement} from 'react';
 import {withResizeDetector} from 'react-resize-detector';
 import YearsLabels from '../YearsLabels';
 import MonthsLabels from '../MonthsLabels';
@@ -9,14 +10,18 @@ const Levels = props => {
 	const {activeLevel} = props;
 	switch (activeLevel) {
 		case 'year':
-			return React.createElement(YearsLabels, {...props, key: 'year'});
+			return createElement(YearsLabels, {...props, key: 'year'});
 		case 'month':
 			return [
-				React.createElement(MonthsLabels, {...props, key: 'month'}),
-				React.createElement(YearsLabels, {...props, key: 'year'}),
+				createElement(MonthsLabels, {...props, key: 'month'}),
+				createElement(YearsLabels, {...props, key: 'year'}),
 			];
 	}
 	return null;
+};
+
+Levels.propTypes = {
+	activeLevel: PropTypes.string,
 };
 
 const XAxis = ({
@@ -60,6 +65,17 @@ const XAxis = ({
 			</div>
 		</div>
 	);
+};
+
+XAxis.propTypes = {
+	activeLevel: PropTypes.string,
+	dayWidth: PropTypes.number,
+	getX: PropTypes.func,
+	height: PropTypes.number,
+	passedWidth: PropTypes.number,
+	period: PropTypes.object,
+	vertical: PropTypes.bool,
+	width: PropTypes.number,
 };
 
 export default withResizeDetector(XAxis);

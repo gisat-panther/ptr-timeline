@@ -55,6 +55,7 @@ export default {
 	plugins: [
 		babel({
 			plugins: ['lodash'],
+			presets: [['@babel/preset-react', {runtime: 'automatic'}]],
 			babelHelpers: 'runtime',
 		}),
 		commonjs({

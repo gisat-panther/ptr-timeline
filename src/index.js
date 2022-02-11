@@ -1,5 +1,6 @@
 import Timeline from './Timeline';
 import MapTimeline from './MapTimeline';
+import MapTimelineLegend from './MapTimeline/MapTimelineLegend';
 import PeriodLimit from './PeriodLimit';
 import Overlay from './Overlay';
 import CenterPicker from './CenterPicker';
@@ -17,6 +18,7 @@ import utils from './utils';
 export {
 	Timeline,
 	MapTimeline,
+	MapTimelineLegend,
 	PeriodLimit,
 	Overlay,
 	CenterPicker,

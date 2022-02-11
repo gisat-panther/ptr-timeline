@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import {cloneElement, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {getTootlipPosition} from '../position';
 import classnames from 'classnames';
@@ -33,7 +33,6 @@ const getTooltipStyle = () => {
 const Popup = ({
 	x,
 	y,
-	maxX,
 	content,
 	getStyle,
 	hoveredElemen,
@@ -101,19 +100,19 @@ const Popup = ({
 
 	return (
 		<div ref={ref} style={{...style}} className={classes}>
-			{content ? React.cloneElement(content) : children}
+			{content ? cloneElement(content) : children}
 		</div>
 	);
 };
 
-Popup.prototype = {
-	x: PropTypes.number,
-	y: PropTypes.number,
-	maxX: PropTypes.number,
+Popup.propTypes = {
+	children: PropTypes.node,
+	compressed: PropTypes.bool,
 	content: PropTypes.element,
 	getStyle: PropTypes.func,
 	hoveredElemen: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-	compressed: PropTypes.bool,
+	x: PropTypes.number,
+	y: PropTypes.number,
 };
 
 export default Popup;

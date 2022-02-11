@@ -1,4 +1,4 @@
-import React from 'react';
+import {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {withResizeDetector} from 'react-resize-detector';
@@ -34,28 +34,13 @@ export const LEVELS = [
 const DEFAULT_VERTICAL_HEIGHT = 70;
 const DEFAULT_HORIZONTAL_HEIGHT = 45;
 
-class Timeline extends React.PureComponent {
+class Timeline extends PureComponent {
 	static propTypes = {
-		periodLimit: PropTypes.shape({
-			start: PropTypes.string,
-			end: PropTypes.string,
-		}).isRequired,
-		period: PropTypes.shape({
-			start: PropTypes.string,
-			end: PropTypes.string,
-		}),
-		dayWidth: PropTypes.number,
-		centerTime: PropTypes.func,
+		centerTime: PropTypes.object,
+		children: PropTypes.node,
 		contentHeight: PropTypes.number,
-		width: PropTypes.number,
+		dayWidth: PropTypes.number,
 		height: PropTypes.number,
-
-		onHover: PropTypes.func,
-		onClick: PropTypes.func,
-
-		periodLimitOnCenter: PropTypes.bool,
-		vertical: PropTypes.bool,
-
 		levels: PropTypes.arrayOf(
 			PropTypes.shape({
 				end: PropTypes.number,
@@ -63,7 +48,21 @@ class Timeline extends React.PureComponent {
 			})
 		), //ordered levels by higher level.end
 		onChange: PropTypes.func,
+		onClick: PropTypes.func,
+		onHover: PropTypes.func,
+		period: PropTypes.shape({
+			end: PropTypes.string,
+			start: PropTypes.string,
+		}),
+		periodLimit: PropTypes.shape({
+			end: PropTypes.string,
+			start: PropTypes.string,
+		}).isRequired,
+		periodLimitOnCenter: PropTypes.bool,
 		selectMode: PropTypes.bool, //whether change time while zoom
+		time: PropTypes.object,
+		vertical: PropTypes.bool,
+		width: PropTypes.number,
 	};
 
 	static defaultProps = {

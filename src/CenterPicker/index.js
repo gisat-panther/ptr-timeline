@@ -1,8 +1,8 @@
-import React from 'react';
+import {PureComponent} from 'react';
 import './picker.scss';
 import PropTypes from 'prop-types';
 
-class Picker extends React.PureComponent {
+class Picker extends PureComponent {
 	static propTypes = {
 		width: PropTypes.number,
 	};

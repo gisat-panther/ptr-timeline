@@ -34,6 +34,10 @@
 		"@gisatcz/ptr-core": "^1.5.0",
 		"@gisatcz/ptr-utils": "^1.5.0",
 		"classnames": "^2.3.1",
+		"eslint": "^8.8.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"eslint-plugin-react": "^7.28.0",
 		"lodash": "^4.17.21",
 		"moment": "2.29.1",
 		"prop-types": "^15.7.2",
@@ -42,9 +46,10 @@
 	"devDependencies": {
 		"@babel/cli": "^7.12.16",
 		"@babel/core": "^7.15.8",
+		"@babel/eslint-parser": "^7.17.0",
 		"@babel/plugin-transform-runtime": "^7.15.8",
 		"@babel/preset-env": "^7.15.8",
-		"@babel/preset-react": "^7.12.13",
+		"@babel/preset-react": "^7.16.7",
 		"@babel/register": "^7.12.13",
 		"@gisatcz/prettier-config": "^0.0.3",
 		"@rollup/plugin-babel": "^5.3.0",
@@ -79,6 +84,8 @@
 		"build:cjs": "cross-env NODE_ENV=cjs rollup -c",
 		"build:lib:es": "npm-run-all build:babel:lib:es",
 		"build:babel:lib:es": "cross-env BABEL_ENV=es babel src -d lib",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"lint": "eslint .",
+		"lintFix": "eslint . --fix"
 	}
 }

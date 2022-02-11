@@ -1,4 +1,5 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import {PureComponent, createRef} from 'react';
 import moment from 'moment';
 import {Context as TimeLineContext} from './context';
 
@@ -80,12 +81,12 @@ const getPoint = (index, cachedEvents, tpCache, targetTouches) => {
 	}
 };
 
-class TimelineEventsWrapper extends React.PureComponent {
+class TimelineEventsWrapper extends PureComponent {
 	static contextType = TimeLineContext;
 	constructor(props) {
 		super(props);
 
-		this.node = React.createRef();
+		this.node = createRef();
 		this._drag = null;
 		this._lastX = null;
 		this._mouseDownX = null;
@@ -563,7 +564,7 @@ class TimelineEventsWrapper extends React.PureComponent {
 		this.decelerating = false;
 	}
 
-	onMouseLeave(e) {
+	onMouseLeave() {
 		const {onHover, updateContext} = this.context;
 		this._drag = false;
 		this._lastX = null;
@@ -735,6 +736,10 @@ class TimelineEventsWrapper extends React.PureComponent {
 		);
 	}
 }
+
+TimelineEventsWrapper.propTypes = {
+	children: PropTypes.node,
+};
 
 /**
  * @see http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/

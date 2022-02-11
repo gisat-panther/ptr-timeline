@@ -1,5 +1,3 @@
-const BUNDLE = process.env.BUNDLE === 'true';
-
 const assetsExtensions = 'png|svg|ico|jpg|jpeg|wof';
 
 const path = require('path'),

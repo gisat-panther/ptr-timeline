@@ -1,8 +1,15 @@
-import React from 'react';
+import {isValidElement, Children, cloneElement} from 'react';
+import {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 
 import hoverContext from './HoverHandler/context';
 
-class TimelineHover extends React.PureComponent {
+class TimelineHover extends PureComponent {
+	static propTypes = {
+		getHoverContent: PropTypes.func,
+		children: PropTypes.node,
+	};
+
 	static contextType = hoverContext;
 	constructor(props) {
 		super(props);
@@ -15,7 +22,7 @@ class TimelineHover extends React.PureComponent {
 			null;
 		if (
 			popupContent &&
-			(React.isValidElement(popupContent) || popupContent?.popup?.content)
+			(isValidElement(popupContent) || popupContent?.popup?.content)
 		) {
 			const hoverItem = {
 				key: 'timeline',
@@ -35,8 +42,8 @@ class TimelineHover extends React.PureComponent {
 	}
 
 	render() {
-		const children = React.Children.map(this.props.children, child =>
-			React.cloneElement(child, {...child.props, onHover: this.onHover})
+		const children = Children.map(this.props.children, child =>
+			cloneElement(child, {...child.props, onHover: this.onHover})
 		);
 
 		return <>{children}</>;

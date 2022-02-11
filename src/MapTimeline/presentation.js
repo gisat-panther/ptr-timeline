@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, Children} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import ReactResizeDetector from 'react-resize-detector';
@@ -10,22 +10,13 @@ import TimeLineHover from '../TimeLineHover';
 import HoverHandler from '../HoverHandler/HoverHandler';
 import {getTootlipPosition} from '../HoverHandler/position';
 
-// import LayerRow from './LayerRow';
-
-import MapTimelineLegend from './MapTimelineLegend';
-
 import XAxis from '../XAxis';
-
-import {defaultTimelineLayerLineHeight} from './constants';
 
 import './style.scss';
 import {isEqual as _isEqual} from 'lodash';
 
-const CONTROLS_WIDTH = 0;
 const TOOLTIP_PADDING = 5;
-const MOUSEBUFFERWIDTH = 20;
 const MIN_TIMELINE_HEIGHT = 4;
-// const {getTootlipPosition} = position;
 
 const MapTimeline = ({
 	LayerRowComponent,
@@ -39,11 +30,11 @@ const MapTimeline = ({
 	getHoverContent,
 	periodLimitOnCenter,
 	selectMode,
-	contentHeight,
 	onLayerClick,
 	layers,
 	mapKey,
-	legend,
+	LegendComponent,
+	minTimelineHeight,
 }) => {
 	const wrapperRef = useRef();
 
@@ -56,7 +47,8 @@ const MapTimeline = ({
 		setPeriod(initPeriod);
 	}, [initPeriod]);
 
-	const minTimelineHeight = MIN_TIMELINE_HEIGHT * utils.getRemSize();
+	minTimelineHeight =
+		minTimelineHeight || MIN_TIMELINE_HEIGHT * utils.getRemSize();
 
 	let top = 0;
 	const overlays = layers.map(layerRow => {
@@ -80,7 +72,7 @@ const MapTimeline = ({
 
 	const contentHeightByLayers = top;
 
-	const childArray = [...React.Children.toArray(children), ...overlays];
+	const childArray = [...Children.toArray(children), ...overlays];
 
 	const getX = date => {
 		date = moment(date);
@@ -107,7 +99,7 @@ const MapTimeline = ({
 				windowScrollLeft,
 			];
 			// return (position,origPosX,origPosY,width,height,hoveredElemen) => {
-			return (origPosX, origPosY, width, height, hoveredElemen) => {
+			return (origPosX, origPosY, width, height) => {
 				const position = getTootlipPosition(
 					referencePoint,
 					['bottom', 'top'],
@@ -143,14 +135,8 @@ const MapTimeline = ({
 			/>
 			<div className={'ptr-maptimeline-scrollable'}>
 				<div className={'ptr-maptimeline'}>
-					{legend && !vertical ? (
-						<MapTimelineLegend
-							layers={layers}
-							lineHeight={
-								legend?.timelineLayerLineHeight ||
-								defaultTimelineLayerLineHeight
-							}
-						/>
+					{LegendComponent && !vertical ? (
+						<LegendComponent layers={layers} />
 					) : null}
 					<div className={'ptr-maptimeline-wrapper'}>
 						<ReactResizeDetector
@@ -173,7 +159,6 @@ const MapTimeline = ({
 												contentHeightByLayers,
 												minTimelineHeight
 											)}
-											// contentHeight={200}
 											selectMode={selectMode}
 										>
 											{childArray}
@@ -189,6 +174,23 @@ const MapTimeline = ({
 	);
 };
 
-MapTimeline.propTypes = {};
+MapTimeline.propTypes = {
+	LayerRowComponent: PropTypes.func,
+	LegendComponent: PropTypes.func,
+	children: PropTypes.node,
+	getHoverContent: PropTypes.func,
+	initPeriod: PropTypes.object,
+	layers: PropTypes.array,
+	levels: PropTypes.array,
+	mapKey: PropTypes.string,
+	onClick: PropTypes.func,
+	onHover: PropTypes.func,
+	onLayerClick: PropTypes.func,
+	periodLimit: PropTypes.object,
+	periodLimitOnCenter: PropTypes.bool,
+	selectMode: PropTypes.bool,
+	vertical: PropTypes.bool,
+	minTimelineHeight: PropTypes.number,
+};
 
 export default MapTimeline;

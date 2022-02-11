@@ -1,5 +1,3 @@
-const BUNDLE = process.env.BUNDLE === 'true';
-
 const path = require('path'),
 	glob = require('glob'),
 	fs = require('fs');

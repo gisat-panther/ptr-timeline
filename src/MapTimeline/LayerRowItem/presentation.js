@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 // import LayerRowPeriodItem from '../LayerRowPeriodItem';
@@ -22,7 +22,7 @@ const LayerRowItem = ({
 	mouseX,
 	period,
 	periodLimit,
-	verticel,
+	vertical,
 	width,
 }) => {
 	const timelineParams = {
@@ -32,7 +32,7 @@ const LayerRowItem = ({
 		mouseX,
 		period,
 		periodLimit,
-		verticel,
+		vertical,
 		width,
 	};
 
@@ -41,7 +41,6 @@ const LayerRowItem = ({
 			usePeriods(layer.periods);
 		}
 	}, []);
-
 	const getOverlayes = () => {
 		if (layer?.periods.length > 0) {
 			// prepare overlay for each period
@@ -94,6 +93,26 @@ const LayerRowItem = ({
 	return [overlays];
 };
 
-LayerRowItem.propTypes = {};
+LayerRowItem.propTypes = {
+	LayerRowPeriodItemComponent: PropTypes.elementType,
+	activeLevel: PropTypes.string,
+	dayWidth: PropTypes.number,
+	getX: PropTypes.func,
+	height: PropTypes.number,
+	layer: PropTypes.shape({
+		periods: PropTypes.array,
+	}),
+	mapKey: PropTypes.string,
+	mouseX: PropTypes.number,
+	onClick: PropTypes.func,
+	period: PropTypes.object,
+	periodKeys: PropTypes.array,
+	periodLimit: PropTypes.object,
+	periodsByConfig: PropTypes.array,
+	top: PropTypes.number,
+	usePeriods: PropTypes.func,
+	vertical: PropTypes.bool,
+	width: PropTypes.number,
+};
 
 export default LayerRowItem;

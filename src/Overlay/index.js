@@ -1,6 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import {map as _map, isNumber as _isNumber} from 'lodash';
+import {map as _map} from 'lodash';
 import moment from 'moment';
 
 import {getOverlays} from '../utils/interval';
@@ -19,6 +18,7 @@ const Overlay = ({period, overlays, getX, vertical, onClick}) => {
 		const overlaysElms = _map(overlaysCfg, overlay => {
 			return (
 				<OverlayItem
+					key={`${overlay.key}`}
 					overlay={overlay}
 					getX={getX}
 					vertical={vertical}
