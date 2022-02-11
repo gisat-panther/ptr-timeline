@@ -34,6 +34,7 @@ const MapTimeline = ({
 	layers,
 	mapKey,
 	LegendComponent,
+	minTimelineHeight,
 }) => {
 	const wrapperRef = useRef();
 
@@ -46,7 +47,8 @@ const MapTimeline = ({
 		setPeriod(initPeriod);
 	}, [initPeriod]);
 
-	const minTimelineHeight = MIN_TIMELINE_HEIGHT * utils.getRemSize();
+	minTimelineHeight =
+		minTimelineHeight || MIN_TIMELINE_HEIGHT * utils.getRemSize();
 
 	let top = 0;
 	const overlays = layers.map(layerRow => {
@@ -188,6 +190,7 @@ MapTimeline.propTypes = {
 	periodLimitOnCenter: PropTypes.bool,
 	selectMode: PropTypes.bool,
 	vertical: PropTypes.bool,
+	minTimelineHeight: PropTypes.number,
 };
 
 export default MapTimeline;
