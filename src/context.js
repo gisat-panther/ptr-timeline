@@ -1,4 +1,5 @@
-import React, {createContext} from 'react';
+import PropTypes from 'prop-types';
+import {createContext} from 'react';
 export const Context = createContext({
 	updateContext: null,
 	width: null,
@@ -24,13 +25,12 @@ export const Context = createContext({
 	moving: null,
 });
 
-export const ContextProvider = props => {
-	// const [state, dispatch] =  React.useReducer(reducer, initialState);
-	// const value = {state, dispatch};
-	const {children, ...propsWithoutChildren} = props;
+export const ContextProvider = ({children, ...rest}) => {
 	return (
-		<Context.Provider value={{...propsWithoutChildren.value}}>
-			{children}
-		</Context.Provider>
+		<Context.Provider value={{...rest.value}}>{children}</Context.Provider>
 	);
+};
+
+ContextProvider.propTypes = {
+	children: PropTypes.node,
 };

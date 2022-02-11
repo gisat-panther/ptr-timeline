@@ -1,4 +1,4 @@
-import React from 'react';
+import {createElement} from 'react';
 import PropTypes from 'prop-types';
 import {map as _map} from 'lodash';
 import moment from 'moment';
@@ -8,7 +8,7 @@ import utils from '../utils';
 import './style.scss';
 
 const YearsLabel = props => {
-	const {period, getX, dayWidth, height, vertical} = props;
+	const {period, getX, height, vertical} = props;
 	const periodStart = moment(period.start);
 	const periodEnd = moment(period.end);
 	const yearsCfg = utils.interval.getYears(periodStart, periodEnd);
@@ -16,7 +16,7 @@ const YearsLabel = props => {
 	const years = _map(yearsCfg, year => {
 		const labelXCorrection = -3;
 		let x = getX(year.start) + labelXCorrection;
-		let label = React.createElement(utils.textLabel.default, {
+		let label = createElement(utils.textLabel.default, {
 			label: year.year,
 			vertical,
 			x,

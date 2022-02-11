@@ -1,9 +1,9 @@
-import React from 'react';
+import {createElement} from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import utils from '../utils';
 const MonthDash = props => {
-	const {x, label, vertical, height, secondary} = props;
+	const {x, label, vertical, secondary} = props;
 
 	const classes = classnames('ptr-timeline-month', {
 		secondary,
@@ -13,7 +13,7 @@ const MonthDash = props => {
 		<g className={classes}>
 			{/* {height === 2 ? React.createElement(utils.dash.D2, {x,vertical}) : null} */}
 			{/* {height === 1 ? React.createElement(utils.dash.D1, {x,vertical}) : null} */}
-			{React.createElement(utils.dash.D1, {x, vertical})}
+			{createElement(utils.dash.D1, {x, vertical})}
 			{label}
 		</g>
 	);

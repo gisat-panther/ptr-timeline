@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import {map as _map} from 'lodash';
 import moment from 'moment';

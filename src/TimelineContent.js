@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import {useContext, Children, cloneElement} from 'react';
 
 import {Context as TimeLineContext} from './context';
 
@@ -26,9 +26,9 @@ const TimelineContent = ({children, ...propsWithoutChildren}) => {
 	const transform = vertical ? `scale(-1,1) translate(-${height},0)` : '';
 
 	const childrenWithProps = [];
-	React.Children.forEach(children, child => {
+	Children.forEach(children, child => {
 		childrenWithProps.push(
-			React.cloneElement(child, {
+			cloneElement(child, {
 				...propsWithoutChildren,
 				period: period,
 				periodLimit: periodLimit,

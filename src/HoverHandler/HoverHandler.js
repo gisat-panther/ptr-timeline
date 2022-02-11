@@ -1,6 +1,6 @@
-import React, {useRef, useState} from 'react';
+import {useRef, useState, createElement} from 'react';
 import PropTypes from 'prop-types';
-import {isNumber as _isNumber} from 'lodash';
+import {isNumber as _isNumber, isEmpty as _isEmpty} from 'lodash';
 import {stateManagement} from '@gisatcz/ptr-utils';
 
 import HoverContext from './context';
@@ -105,7 +105,7 @@ const HoverHandler = ({
 			...newHoveredItems,
 		];
 
-		if (!_.isEmpty(update)) {
+		if (!_isEmpty(update)) {
 			setState(prevState => ({...prevState, ...update}));
 		}
 	};
@@ -119,7 +119,7 @@ const HoverHandler = ({
 				y={y}
 				content={
 					popupContentComponent
-						? React.createElement(popupContentComponent, {
+						? createElement(popupContentComponent, {
 								data: data,
 								featureKeys: hoveredItems,
 								fidColumnName: fidColumnName,
@@ -151,6 +151,13 @@ const HoverHandler = ({
 			</div>
 		</HoverContext.Provider>
 	);
+};
+
+HoverHandler.propTypes = {
+	children: PropTypes.node,
+	compressedPopups: PropTypes.bool,
+	getStyle: PropTypes.func,
+	popupContentComponent: PropTypes.node,
 };
 
 export default HoverHandler;

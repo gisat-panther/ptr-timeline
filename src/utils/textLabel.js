@@ -1,7 +1,7 @@
-import React from 'react';
+import {PureComponent, createRef} from 'react';
 import PropTypes from 'prop-types';
 
-class TextLabel extends React.PureComponent {
+class TextLabel extends PureComponent {
 	static propTypes = {
 		label: PropTypes.string.isRequired,
 		className: PropTypes.string,
@@ -17,7 +17,7 @@ class TextLabel extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
-		this.node = React.createRef();
+		this.node = createRef();
 		this.state = {
 			elHeight: 0,
 			elWidth: 0,

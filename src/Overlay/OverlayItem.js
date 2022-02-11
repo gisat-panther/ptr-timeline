@@ -1,7 +1,6 @@
-import React, {useContext} from 'react';
+import {useContext} from 'react';
 import PropTypes from 'prop-types';
 
-import {map as _map, isNumber as _isNumber} from 'lodash';
 import classNames from 'classnames';
 import hoverContext from '../HoverHandler/context';
 import './style.scss';
@@ -46,7 +45,7 @@ const OverlayItem = ({overlay, getX, vertical, onClick}) => {
 		);
 	};
 
-	const onMouseLeave = evt => {
+	const onMouseLeave = () => {
 		context.onHoverOut([
 			{
 				key: overlay.key,

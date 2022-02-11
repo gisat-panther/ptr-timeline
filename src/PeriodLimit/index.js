@@ -1,4 +1,4 @@
-import React from 'react';
+import {PureComponent, createElement} from 'react';
 import PropTypes from 'prop-types';
 import {getPeriodLimits} from '../utils/interval';
 
@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import './style.scss';
 
-class PeriodLimit extends React.PureComponent {
+class PeriodLimit extends PureComponent {
 	static propTypes = {
 		periodLimit: PropTypes.shape({
 			start: PropTypes.string,
@@ -58,7 +58,7 @@ class PeriodLimit extends React.PureComponent {
 			);
 		});
 
-		return React.createElement('g', null, <>{periodLimitsElms}</>);
+		return createElement('g', null, <>{periodLimitsElms}</>);
 	}
 }
 

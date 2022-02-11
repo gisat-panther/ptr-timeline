@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
 import {utils} from '@gisatcz/ptr-utils';
@@ -21,6 +20,11 @@ const MapTimelineLegend = ({layers, lineHeight = defaultLineHeight}) => {
 		}) || [];
 
 	return <div className={'ptr-maptimelinelegend'}>{layersElms}</div>;
+};
+
+MapTimelineLegend.propTypes = {
+	layers: PropTypes.array,
+	lineHeight: PropTypes.number,
 };
 
 export default MapTimelineLegend;

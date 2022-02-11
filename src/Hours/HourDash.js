@@ -1,9 +1,7 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import {D1, D2, D3} from '../utils/dash';
 
-const HoursDash = props => {
-	const {x, label, vertical, height} = props;
+const HoursDash = ({x, label, vertical, height}) => {
 	return (
 		<g className={'ptr-timeline-hour'}>
 			{height === 1 ? <D1 x={x} vertical={vertical} /> : null}
@@ -18,6 +16,7 @@ HoursDash.propTypes = {
 	x: PropTypes.number.isRequired,
 	label: PropTypes.element,
 	vertical: PropTypes.bool,
+	height: PropTypes.number,
 };
 
 HoursDash.defaultProps = {

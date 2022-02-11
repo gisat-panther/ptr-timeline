@@ -1,4 +1,3 @@
-import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {intersection as _intersection, last as _last} from 'lodash';
 import moment from 'moment';
@@ -42,7 +41,7 @@ const LayerRowPeriodItem = ({
 	mouseX,
 	period,
 	periodLimit,
-	verticel,
+	vertical,
 	width,
 }) => {
 	const timelineParams = {
@@ -52,7 +51,7 @@ const LayerRowPeriodItem = ({
 		mouseX,
 		period,
 		periodLimit,
-		verticel,
+		vertical,
 		width,
 	};
 
@@ -89,6 +88,27 @@ const LayerRowPeriodItem = ({
 	}
 };
 
-LayerRowPeriodItem.propTypes = {};
+LayerRowPeriodItem.propTypes = {
+	active: PropTypes.bool,
+	activeLevel: PropTypes.string,
+	dayWidth: PropTypes.number,
+	getX: PropTypes.func,
+	height: PropTypes.number,
+	layer: PropTypes.shape({
+		layerState: PropTypes.any,
+	}),
+	mouseX: PropTypes.number,
+	onClick: PropTypes.func,
+	originPeriod: PropTypes.object,
+	parsedPeriod: PropTypes.shape({
+		end: PropTypes.any,
+		start: PropTypes.any,
+	}),
+	period: PropTypes.object,
+	periodLimit: PropTypes.object,
+	top: PropTypes.number,
+	vertical: PropTypes.bool,
+	width: PropTypes.number,
+};
 
 export default LayerRowPeriodItem;

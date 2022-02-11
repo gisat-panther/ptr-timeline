@@ -1,8 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
-import {defaultElementHeight, defaultLineHeight} from '../constants';
-// import LayerRowItem from '../LayerRowItem';
+import {defaultElementHeight} from '../constants';
 
 const LayerRow = ({
 	layerRow,
@@ -20,7 +18,7 @@ const LayerRow = ({
 	mouseX,
 	period,
 	periodLimit,
-	verticel,
+	vertical,
 	width,
 }) => {
 	const timelineParams = {
@@ -30,7 +28,7 @@ const LayerRow = ({
 		mouseX,
 		period,
 		periodLimit,
-		verticel,
+		vertical,
 		width,
 	};
 
@@ -83,6 +81,25 @@ const LayerRow = ({
 	return <>{layerRowsElms}</>;
 };
 
-LayerRow.propTypes = {};
+LayerRow.propTypes = {
+	LayerRowItemComponent: PropTypes.func,
+	activeLevel: PropTypes.string,
+	dayWidth: PropTypes.number,
+	getX: PropTypes.func,
+	layerRow: PropTypes.shape({
+		elementHeight: PropTypes.any,
+		items: PropTypes.array,
+	}),
+	layers: PropTypes.array,
+	mapKey: PropTypes.string,
+	mouseX: PropTypes.number,
+	onLayerClick: PropTypes.func,
+	period: PropTypes.object,
+	periodLimit: PropTypes.object,
+	toggleLayer: PropTypes.func,
+	top: PropTypes.number,
+	vertical: PropTypes.bool,
+	width: PropTypes.number,
+};
 
 export default LayerRow;
