@@ -1,3 +1,16 @@
+# v0.1.6 (Fri Feb 11 2022)
+
+#### 🐾 Patch
+
+- Update node version in release proccess [#20](https://github.com/gisat-panther/ptr-timeline/pull/20) ([@vdubr](https://github.com/vdubr))
+- Feature/lagend as component [#19](https://github.com/gisat-panther/ptr-timeline/pull/19) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.5 (Mon Jan 24 2022)
 
 #### 🐾 Patch
