@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, createElement} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import ReactResizeDetector from 'react-resize-detector';
@@ -43,7 +43,7 @@ const MapTimeline = ({
 	onLayerClick,
 	layers,
 	mapKey,
-	legend,
+	LegendComponent,
 }) => {
 	const wrapperRef = useRef();
 
@@ -143,14 +143,8 @@ const MapTimeline = ({
 			/>
 			<div className={'ptr-maptimeline-scrollable'}>
 				<div className={'ptr-maptimeline'}>
-					{legend && !vertical ? (
-						<MapTimelineLegend
-							layers={layers}
-							lineHeight={
-								legend?.timelineLayerLineHeight ||
-								defaultTimelineLayerLineHeight
-							}
-						/>
+					{LegendComponent && !vertical ? (
+						<LegendComponent layers={layers} />
 					) : null}
 					<div className={'ptr-maptimeline-wrapper'}>
 						<ReactResizeDetector
