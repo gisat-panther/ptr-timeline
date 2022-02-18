@@ -1,3 +1,15 @@
+# v0.1.7 (Fri Feb 18 2022)
+
+#### 🐾 Patch
+
+- Change way how compute tooltip height [#21](https://github.com/gisat-panther/ptr-timeline/pull/21) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.6 (Fri Feb 11 2022)
 
 #### 🐾 Patch
