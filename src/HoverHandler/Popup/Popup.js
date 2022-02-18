@@ -1,4 +1,4 @@
-import {cloneElement, useRef} from 'react';
+import {cloneElement, useState, useLayoutEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {getTootlipPosition} from '../position';
 import classnames from 'classnames';
@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import './style.scss';
 
 const WIDTH = 250;
-const HEIGHT = 50;
+const HEIGHT = 0;
 const TOOLTIP_PADDING = 15;
 
 const getTooltipStyle = () => {
@@ -41,6 +41,16 @@ const Popup = ({
 }) => {
 	const ref = useRef();
 
+	const heightRef = useRef();
+	const [tooltipHeight, setTooltipHeight] = useState(0);
+
+	useLayoutEffect(() => {
+		heightRef.current = ref?.current?.offsetHeight;
+		if (ref?.current?.offsetHeight !== tooltipHeight) {
+			setTooltipHeight(ref?.current?.offsetHeight);
+		}
+	}, [content]);
+
 	const getPopupStyle = () => {
 		let posX = x;
 		let posY = y;
@@ -51,9 +61,8 @@ const Popup = ({
 		const maxHeight = maxY - minY - 20;
 
 		const element = ref.current;
-		let width = element && element.offsetWidth ? element.offsetWidth : WIDTH;
-		let height =
-			element && element.offsetHeight ? element.offsetHeight : HEIGHT;
+		let width = element?.offsetWidth || WIDTH;
+		const height = tooltipHeight || HEIGHT;
 
 		let style = null;
 
