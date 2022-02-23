@@ -1,3 +1,15 @@
+# v0.1.8 (Wed Feb 23 2022)
+
+#### 🐾 Patch
+
+- Wram XAxe MapTimeline component by event wrapper. [#22](https://github.com/gisat-panther/ptr-timeline/pull/22) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.7 (Fri Feb 18 2022)
 
 #### 🐾 Patch
