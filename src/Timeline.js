@@ -98,20 +98,31 @@ class Timeline extends PureComponent {
 
 	componentDidUpdate(prevProps) {
 		const {dayWidth, time, width, height, periodLimit} = this.props;
+
+		const timeHasChanged =
+			prevProps.time &&
+			time &&
+			prevProps.time.toString() !== time.toString() &&
+			this.state.centerTime.toString() !== time.toString();
+
 		//if parent component set dayWidth
-		if (prevProps.dayWidth !== dayWidth && this.state.dayWidth !== dayWidth) {
+		if (
+			prevProps.dayWidth !== dayWidth &&
+			this.state.dayWidth !== dayWidth &&
+			!timeHasChanged
+		) {
 			this.updateContext({dayWidth, centerTime: time});
 		}
 
 		//if parent component set time
-		if (
-			prevProps.time &&
-			time &&
-			prevProps.time.toString() !== time.toString() &&
-			this.state.centerTime.toString() !== time.toString()
-		) {
-			const period = this.getPeriodLimitByTime(time);
-
+		if (timeHasChanged) {
+			const xAxis = this.getXAxisWidth();
+			const period = this.getPeriodLimitByTime(
+				time,
+				xAxis,
+				this.state.periodLimit,
+				dayWidth
+			);
 			//zoom to dayWidth
 			this.updateContext({period, centerTime: time});
 		}

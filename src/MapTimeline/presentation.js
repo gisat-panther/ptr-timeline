@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState, Children} from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import ReactResizeDetector from 'react-resize-detector';
 
 import {utils} from '@gisatcz/ptr-utils';
@@ -13,7 +12,7 @@ import {getTootlipPosition} from '../HoverHandler/position';
 import XAxis from '../XAxis';
 
 import './style.scss';
-import {isEqual as _isEqual} from 'lodash';
+import {isEqual as _isEqual, isEmpty as _isEmpty} from 'lodash';
 
 const TOOLTIP_PADDING = 5;
 const MIN_TIMELINE_HEIGHT = 4;
@@ -38,13 +37,15 @@ const MapTimeline = ({
 }) => {
 	const wrapperRef = useRef();
 
-	const [period, setPeriod] = useState({...initPeriod});
-	const [dayWidth, setDayWidth] = useState(null);
-	const [activeLevel, setActiveLevel] = useState(null);
+	const [timelineState, setTimelineState] = useState({
+		period: {...initPeriod},
+		dayWidth: null,
+		activeLevel: null,
+	});
 	const [timelineWidth, setTimelineWidth] = useState(null);
 
 	useEffect(() => {
-		setPeriod(initPeriod);
+		setTimelineState({period: initPeriod});
 	}, [initPeriod]);
 
 	minTimelineHeight =
@@ -73,13 +74,6 @@ const MapTimeline = ({
 	const contentHeightByLayers = top;
 
 	const childArray = [...Children.toArray(children), ...overlays];
-
-	const getX = date => {
-		date = moment(date);
-		let diff = date.unix() - moment(period.start).unix();
-		let diffDays = diff / (60 * 60 * 24);
-		return diffDays * dayWidth;
-	};
 
 	const getHorizontalTootlipStyle = () => {
 		const referencePoint = 'center';
@@ -112,27 +106,41 @@ const MapTimeline = ({
 	};
 
 	const onChange = change => {
-		if (change.dayWidth !== dayWidth) {
-			setDayWidth(change.dayWidth);
+		const update = {};
+		if (change.dayWidth !== timelineState.dayWidth) {
+			update['dayWidth'] = change.dayWidth;
 		}
-		if (!_isEqual(change.period, period)) {
-			setPeriod(change.period);
+		if (!_isEqual(change.centerTime, timelineState.time)) {
+			update['time'] = change.centerTime;
 		}
-		if (change.activeLevel !== activeLevel) {
-			setActiveLevel(change.activeLevel);
+		if (change.activeLevel !== timelineState.activeLevel) {
+			update['activeLevel'] = change.activeLevel;
+		}
+
+		if (!_isEmpty(update)) {
+			setTimelineState({...timelineState, ...update});
 		}
 	};
 
 	return (
 		<div ref={wrapperRef}>
-			<XAxis
-				period={period}
-				getX={getX}
-				dayWidth={dayWidth}
-				vertical={vertical}
-				activeLevel={activeLevel}
-				passedWidth={timelineWidth}
-			/>
+			<div className={'ptr-timeline-x-axe'}>
+				<div className={'ptr-timeline-legend-placeholder'}></div>
+				<Timeline
+					time={timelineState.time}
+					dayWidth={timelineState.dayWidth}
+					periodLimit={periodLimit}
+					periodLimitOnCenter={periodLimitOnCenter}
+					onChange={onChange}
+					vertical={vertical}
+					levels={levels}
+					contentHeight={28}
+					selectMode={selectMode}
+				>
+					<XAxis />
+				</Timeline>
+			</div>
+
 			<div className={'ptr-maptimeline-scrollable'}>
 				<div className={'ptr-maptimeline'}>
 					{LegendComponent && !vertical ? (
@@ -148,6 +156,8 @@ const MapTimeline = ({
 								<HoverHandler getStyle={getHorizontalTootlipStyle()}>
 									<TimeLineHover getHoverContent={getHoverContent}>
 										<Timeline
+											dayWidth={timelineState.dayWidth}
+											time={timelineState.time}
 											periodLimit={periodLimit}
 											periodLimitOnCenter={periodLimitOnCenter}
 											onChange={onChange}
