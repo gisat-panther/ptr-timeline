@@ -1,3 +1,15 @@
+# v0.1.9 (Mon Feb 28 2022)
+
+#### 🐾 Patch
+
+- Fix/touch click [#24](https://github.com/gisat-panther/ptr-timeline/pull/24) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.8 (Wed Feb 23 2022)
 
 #### 🐾 Patch
