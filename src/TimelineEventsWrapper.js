@@ -140,7 +140,10 @@ class TimelineEventsWrapper extends PureComponent {
 
 	end_handler(ev) {
 		const {vertical} = this.context;
-		ev.preventDefault();
+
+		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
+		// ev.preventDefault();
+
 		const clientX = getPageXFromEvent(
 			ev,
 			vertical,
@@ -186,7 +189,10 @@ class TimelineEventsWrapper extends PureComponent {
 		// three simultaneous touches, the first touchstart event will have
 		// targetTouches length of one, the second event will have a length
 		// of two, and so on.
-		ev.preventDefault();
+
+		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
+		// ev.preventDefault();
+
 		if (this.tpCache.length > 0) {
 			for (let i = 0; i < ev.touches.length; i++) {
 				this.removeTouchEventByIdentifier(ev.touches[i].identifier);
