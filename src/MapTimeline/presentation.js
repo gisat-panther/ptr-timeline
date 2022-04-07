@@ -45,7 +45,10 @@ const MapTimeline = ({
 	const [timelineWidth, setTimelineWidth] = useState(null);
 
 	useEffect(() => {
-		setTimelineState({period: initPeriod});
+		setTimelineState({
+			...timelineState,
+			period: initPeriod,
+		});
 	}, [initPeriod]);
 
 	minTimelineHeight =
