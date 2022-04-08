@@ -61,7 +61,7 @@ const TimelineContent = ({children, ...propsWithoutChildren}) => {
 };
 
 TimelineContent.propTypes = {
-	children: propTypes.array,
+	children: propTypes.node,
 };
 
 export default TimelineContent;

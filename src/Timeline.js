@@ -128,7 +128,7 @@ class Timeline extends PureComponent {
 		}
 
 		if (prevProps.periodLimit !== periodLimit) {
-			this.updateContext({period: periodLimit});
+			this.updateContext({period: periodLimit, periodLimit});
 		}
 
 		//if parent component set time
@@ -166,11 +166,11 @@ class Timeline extends PureComponent {
 
 		//check if setTime is in periodLimit
 		if (setTime.isBefore(periodLimit.start)) {
-			setTime = periodLimit.start;
+			setTime = moment(periodLimit.start);
 		}
 
 		if (setTime.isAfter(periodLimit.end)) {
-			setTime = periodLimit.end;
+			setTime = moment(periodLimit.end);
 		}
 
 		const halfDays = allDays / 2;

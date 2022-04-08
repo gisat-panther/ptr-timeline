@@ -140,7 +140,7 @@ const MapTimeline = ({
 					contentHeight={28}
 					selectMode={selectMode}
 				>
-					<XAxis />
+					<XAxis key={'maptimeline-xaxis'} />
 				</Timeline>
 			</div>
 
