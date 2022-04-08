@@ -100,7 +100,7 @@ LayerRowItem.propTypes = {
 	getX: PropTypes.func,
 	height: PropTypes.number,
 	layer: PropTypes.shape({
-		periods: PropTypes.array,
+		periods: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 	}),
 	mapKey: PropTypes.string,
 	mouseX: PropTypes.number,
