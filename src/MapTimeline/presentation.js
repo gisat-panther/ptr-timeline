@@ -34,6 +34,7 @@ const MapTimeline = ({
 	mapKey,
 	LegendComponent,
 	minTimelineHeight,
+	contentHeight,
 }) => {
 	const wrapperRef = useRef();
 
@@ -144,7 +145,10 @@ const MapTimeline = ({
 				</Timeline>
 			</div>
 
-			<div className={'ptr-maptimeline-scrollable'}>
+			<div
+				className={'ptr-maptimeline-scrollable'}
+				style={{...(contentHeight ? {height: contentHeight} : {})}}
+			>
 				<div className={'ptr-maptimeline'}>
 					{LegendComponent && !vertical ? (
 						<LegendComponent layers={layers} />
@@ -204,6 +208,7 @@ MapTimeline.propTypes = {
 	selectMode: PropTypes.bool,
 	vertical: PropTypes.bool,
 	minTimelineHeight: PropTypes.number,
+	contentHeight: PropTypes.number,
 };
 
 export default MapTimeline;
