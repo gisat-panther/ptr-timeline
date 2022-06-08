@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import {PureComponent, createRef} from 'react';
+import {useEffect, useRef, useState, useContext} from 'react';
 import moment from 'moment';
 import {Context as TimeLineContext} from './context';
 
@@ -81,304 +81,50 @@ const getPoint = (index, cachedEvents, tpCache, targetTouches) => {
 	}
 };
 
-class TimelineEventsWrapper extends PureComponent {
-	static contextType = TimeLineContext;
-	constructor(props) {
-		super(props);
+const TimelineEventsWrapper = ({children}) => {
+	const context = useContext(TimeLineContext);
+	const node = useRef();
 
-		this.node = createRef();
-		this._drag = null;
-		this._lastX = null;
-		this._mouseDownX = null;
-		this.decelerating = false;
-		this._pointerLastX = null;
-		this.multiplier = 5;
-		this.friction = 0.91; //default 0.92
-		this.stopThreshold = 0.3;
-		this.targetX = 0;
-		this.trackingPoints = [];
-		this.decVelX = 0;
+	const decelerating = useRef(false);
+	const decVelX = useRef(0);
 
-		this.onWheel = this.onWheel.bind(this);
-		this.onPinch = this.onPinch.bind(this);
-		this.onDrag = this.onDrag.bind(this);
-		this.onMouseDown = this.onMouseDown.bind(this);
-		this.onClick = this.onClick.bind(this);
-		this.onMouseUp = this.onMouseUp.bind(this);
-		this.onMouseMove = this.onMouseMove.bind(this);
-		this.onMouseLeave = this.onMouseLeave.bind(this);
+	// improvement everything to useRef?
+	const [_drag, set_drag] = useState(null);
+	const [_lastX, set_lastX] = useState(null);
+	const [_mouseDownX, set_mouseDownX] = useState(null);
+	const [_pointerLastX, set_pointerLastX] = useState(null);
+	const [multiplier] = useState(5);
+	const [friction] = useState(0.91); //default 0.92
+	const [stopThreshold] = useState(0.3);
+	const [trackingPoints, setTrackingPoints] = useState([]);
+	// Global vars to cache event state
+	const [tpCache, setTpCache] = useState([]);
 
-		this.start_handler = this.start_handler.bind(this);
-		this.end_handler = this.end_handler.bind(this);
-		this.move_handler = this.move_handler.bind(this);
+	const clearTouchEventCache = () => {
+		setTpCache([]);
+	};
 
-		// Global vars to cache event state
-		this.tpCache = [];
-		this.prevDiff = -1;
-	}
-	componentDidMount() {
-		this.node.current.addEventListener('touchstart', this.start_handler);
-		this.node.current.addEventListener('touchmove', this.move_handler);
-		this.node.current.addEventListener('touchend', this.end_handler);
-		this.node.current.addEventListener('touchcancel', this.end_handler);
-		// fix bubling wheel event
-		// https://github.com/facebook/react/issues/14856#issuecomment-586781399
-		this.node.current.addEventListener('wheel', this.onWheel, {
-			passive: false,
-			capture: true,
-		});
-	}
-
-	componentWillUnmount() {
-		this.node.current.removeEventListener('touchstart', this.start_handler);
-		this.node.current.removeEventListener('touchmove', this.move_handler);
-
-		this.node.current.removeEventListener('touchend', this.end_handler);
-		this.node.current.removeEventListener('touchcancel', this.end_handler);
-		this.node.current.removeEventListener('wheel', this.onWheel);
-	}
-
-	end_handler(ev) {
-		const {vertical} = this.context;
-
-		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
-		// ev.preventDefault();
-
-		const clientX = getPageXFromEvent(
-			ev,
-			vertical,
-			this.node.current.getBoundingClientRect()
+	const removeTouchEventByIdentifier = identifier => {
+		setTpCache(
+			tpCache.filter(ev => {
+				return ev.identifier !== identifier;
+			})
 		);
+	};
 
-		//identify stop touch move by one touch
-		if (ev.changedTouches.length === 1 && this.tpCache.length === 1) {
-			this.onPointerUp(clientX);
-		}
-
-		//remove from cache by identifier
-		for (let i = 0; i < ev.changedTouches.length; i++) {
-			this.removeTouchEventByIdentifier(ev.changedTouches[i].identifier);
-		}
-
-		//FIX - sometime touchend or touchcancel is not called and touch stick in cache
-		if (ev.touches.length === 0 && this.tpCache.length > 0) {
-			this.clearTouchEventCache();
-		}
-	}
-
-	clearTouchEventCache() {
-		this.tpCache = [];
-	}
-
-	removeTouchEventByIdentifier(identifier) {
-		this.tpCache = this.tpCache.filter(ev => {
-			return ev.identifier !== identifier;
-		});
-	}
-
-	cacheEvents(evts) {
+	const cacheEvents = evts => {
+		const tmp = [];
 		for (let i = 0; i < evts.length; i++) {
-			this.tpCache.push(evts[i]);
+			tmp.push(evts[i]);
 		}
-	}
+		setTpCache([...tpCache, ...tmp]);
+	};
 
-	start_handler(ev) {
-		const {vertical} = this.context;
-		// If the user makes simultaneious touches, the browser will fire a
-		// separate touchstart event for each touch point. Thus if there are
-		// three simultaneous touches, the first touchstart event will have
-		// targetTouches length of one, the second event will have a length
-		// of two, and so on.
-
-		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
-		// ev.preventDefault();
-
-		if (this.tpCache.length > 0) {
-			for (let i = 0; i < ev.touches.length; i++) {
-				this.removeTouchEventByIdentifier(ev.touches[i].identifier);
-			}
-		}
-		// Cache the touch points for later processing of 2-touch pinch/zoom
-		this.cacheEvents(ev.touches);
-
-		//identify only one touch
-		this.trackingPoints = [];
-		this._pointerLastX = null;
-		this.resetMouseTouchProps();
-		if (this.tpCache.length === 1) {
-			const clientX = getPageXFromEvent(
-				ev,
-				vertical,
-				this.node.current.getBoundingClientRect()
-			);
-			this.onPointerDown(clientX);
-		}
-	}
-
-	move_handler(ev) {
-		const {vertical} = this.context;
-		ev.preventDefault();
-
-		//identify pinch/zoom touch
-		if (this.tpCache.length === 2) {
-			this.handle_pinch_zoom(ev.touches);
-		}
-
-		//identify touch by one touch
-		if (this.tpCache.length === 1) {
-			const clientX = getPageXFromEvent(
-				ev,
-				vertical,
-				this.node.current.getBoundingClientRect()
-			);
-			this.onPointerMove(clientX);
-
-			this.clearTouchEventCache();
-			// Cache the touch points for later processing
-			this.cacheEvents([ev.touches[0]]);
-		}
-	}
-
-	onPointerMove(clientX) {
-		const distance = clientX - this._lastX;
-		if (distance !== 0) {
-			this.onDrag({
-				distance: Math.abs(distance),
-				direction: distance < 0 ? 'future' : 'past',
-			});
-			this.registerMovements(clientX);
-		}
-	}
-
-	setMoving(moving = false) {
-		const {updateContext} = this.context;
-		updateContext({
-			moving: moving,
-		});
-	}
-
-	onPointerDown(clientX) {
-		this.setMoving(true);
-		this._drag = true;
-		this.trackingPoints = [];
-		this._lastX = clientX;
-		this._pointerLastX = clientX;
-		this._mouseDownX = clientX;
-		this.addTrackingPoint(this._pointerLastX);
-	}
-
-	onPointerUp(clientX) {
-		const isClick = Math.abs(this._mouseDownX - clientX) < 1;
-		this.resetMouseTouchProps();
-		if (isClick) {
-			this.onClick(clientX);
-		}
-
-		this.stopTracking();
-	}
-
-	// This is a very basic 2-touch move/pinch/zoom handler that does not include
-	// error handling, only handles horizontal moves, etc.
-	handle_pinch_zoom(touches) {
-		const cachedEvents = [];
-
-		for (let i = 0; i < touches.length; i++) {
-			const found = this.tpCache.findIndex(
-				e => e.identifier === touches[i].identifier
-			);
-			if (found > -1) {
-				cachedEvents[i] = found;
-			}
-		}
-
-		const prevPoint1 = this.tpCache[0];
-		const prevPoint2 = this.tpCache[1];
-		const point1 = getPoint(0, cachedEvents, this.tpCache, touches);
-		const point2 = getPoint(1, cachedEvents, this.tpCache, touches);
-		const prevDist = calculateEventDistance(prevPoint1, prevPoint2);
-		const dist = calculateEventDistance(point1, point2);
-
-		this.clearTouchEventCache();
-
-		// Cache the touch points for later processing of 2-touch pinch/zoom
-		this.cacheEvents([point1, point2]);
-		const targetBox = this.node.current.getBoundingClientRect();
-		const centerPoint = [
-			(point1.clientX + point2.clientX) / 2 - targetBox.left,
-			(point1.clientY + point2.clientY) / 2 - targetBox.top,
-		];
-		this.onPinch(dist / prevDist, centerPoint);
-	}
-
-	resetMouseTouchProps() {
-		this._drag = false;
-		this._lastX = null;
-		this._mouseDownX = null;
-	}
-
-	onMouseUp(e) {
-		const {vertical} = this.context;
-		const clientX = getPageXFromEvent(
-			e,
-			vertical,
-			this.node.current.getBoundingClientRect()
-		);
-		this.onPointerUp(clientX);
-	}
-
-	onMouseDown(e) {
-		const {vertical} = this.context;
-		const clientX = getPageXFromEvent(
-			e,
-			vertical,
-			this.node.current.getBoundingClientRect()
-		);
-		this.onPointerDown(clientX);
-	}
-
-	onClick(clientX) {
-		const {onClick, getTime} = this.context;
-
-		onClick({
-			type: 'time',
-			x: clientX,
-			time: getTime(clientX),
-		});
-	}
-
-	onMouseMove(e) {
-		const {vertical, getTime, updateContext, onHover, dayWidth} = this.context;
-		const clientX = getPageXFromEvent(
-			e,
-			vertical,
-			this.node.current.getBoundingClientRect()
-		);
-		const clientY = getPageYFromEvent(
-			e,
-			vertical,
-			this.node.current.getBoundingClientRect()
-		);
-
-		onHover({
-			x: e.pageX,
-			y: e.pageY,
-			clientX,
-			clientY,
-			time: getTime(clientX),
-			dayWidth,
-			vertical: vertical,
-		});
-
-		updateContext({
-			mouseX: clientX,
-			mouseTime: getTime(clientX).toDate(),
-		});
-
-		if (this._drag) {
-			this.onPointerMove(clientX);
-			e.preventDefault();
-		}
-	}
+	const resetMouseTouchProps = () => {
+		set_drag(false);
+		set_lastX(null);
+		set_mouseDownX(null);
+	};
 
 	/**
 	 * When the user drags the timeline, if it is still permitted, it updates the available and visible periodLimit and
@@ -386,8 +132,9 @@ class TimelineEventsWrapper extends PureComponent {
 	 * @param dragInfo {Object}
 	 * @param dragInfo.distance {Number} Amount of pixels to move in given direction
 	 * @param dragInfo.direction {String} Either past or future. Based on this.
+	 * @param dragInfo.clientX {Number} Mouse position
 	 */
-	onDrag(dragInfo) {
+	const onDrag = dragInfo => {
 		const {
 			dayWidth,
 			periodLimit,
@@ -395,7 +142,7 @@ class TimelineEventsWrapper extends PureComponent {
 			width,
 			updateContext,
 			periodLimitOnCenter,
-		} = this.context;
+		} = context;
 		const allDays = width / dayWidth;
 		const periodStart = moment(periodLimit.start);
 		const periodEnd = moment(periodLimit.end);
@@ -408,7 +155,6 @@ class TimelineEventsWrapper extends PureComponent {
 			halfDays * (60 * 60 * 24 * 1000),
 			'ms'
 		);
-
 		// Either add  to start and end.
 		let daysChange = Math.abs(dragInfo.distance) / dayWidth;
 		if (dragInfo.direction === 'past') {
@@ -468,169 +214,158 @@ class TimelineEventsWrapper extends PureComponent {
 		}
 
 		updateContext({
+			...(dragInfo.clientX ? {mouseX: dragInfo.clientX} : {}),
 			period: {
 				end: periodLimitEnd.toDate().toString(),
 				start: periodLimitStart.toDate().toString(),
 			},
 		});
-	}
-
-	/**
-	 * Handles move events
-	 * @param  {clientX} ev Normalized event
-	 */
-	registerMovements(clientX) {
-		this._lastX = clientX;
-		if (this._drag) {
-			this.addTrackingPoint(this._lastX);
-		}
-
-		const pointerChangeX = this._lastX - this._pointerLastX;
-
-		this.targetX += pointerChangeX * this.multiplier;
-
-		this._pointerLastX = this._lastX;
-	}
+	};
 
 	/**
 	 * Records movement for the last 100ms
 	 * @param {number} x
 	 */
-	addTrackingPoint(x) {
+	const addTrackingPoint = x => {
 		const time = Date.now();
-		while (this.trackingPoints.length > 0) {
-			if (time - this.trackingPoints[0].time <= 100) {
+		const tmpTrackingPoints = [...trackingPoints];
+		while (tmpTrackingPoints.length > 0) {
+			if (time - tmpTrackingPoints[0].time <= 100) {
 				break;
 			}
-			this.trackingPoints.shift();
+			tmpTrackingPoints.shift();
 		}
+		setTrackingPoints([...tmpTrackingPoints, {x, time}]);
+	};
 
-		this.trackingPoints.push({x, time});
-	}
+	const onPointerDown = clientX => {
+		setMoving(true);
+		set_drag(true);
+		setTrackingPoints([]);
+		set_lastX(clientX);
+		set_pointerLastX(clientX);
+		set_mouseDownX(clientX);
+		addTrackingPoint(clientX);
+	};
 
 	/**
-	 * Stops movement tracking, starts animation
+	 * Handles move events
+	 * @param  {clientX} ev Normalized event
 	 */
-	stopTracking() {
-		this.addTrackingPoint(this._pointerLastX);
-
-		this.startDecelAnim();
-	}
-
-	/**
-	 * Initialize animation of values coming to a stop
-	 */
-	startDecelAnim() {
-		const firstPoint = this.trackingPoints[0];
-		const lastPoint = this.trackingPoints[this.trackingPoints.length - 1];
-
-		const xOffset = lastPoint.x - firstPoint.x;
-		const timeOffset = lastPoint.time - firstPoint.time;
-
-		const D = timeOffset / 15 / this.multiplier;
-
-		this.decVelX = xOffset / D || 0; // prevent NaN
-
-		//check difference start/stop
-		if (Math.abs(this.decVelX) > 1) {
-			this.decelerating = true;
-			// end
-			requestAnimFrame(() => this.stepDecelAnim());
-		} else {
-			this.clearScroll();
+	const registerMovements = clientX => {
+		set_lastX(clientX);
+		if (_drag) {
+			addTrackingPoint(clientX);
 		}
-	}
+		set_pointerLastX(clientX);
+	};
+
+	const onPointerMove = clientX => {
+		const distance = clientX - _lastX;
+		if (distance !== 0) {
+			onDrag({
+				distance: Math.abs(distance),
+				direction: distance < 0 ? 'future' : 'past',
+				clientX,
+			});
+			registerMovements(clientX);
+		}
+	};
+
+	const setMoving = (moving = false) => {
+		const {updateContext} = context;
+		updateContext({
+			moving: moving,
+		});
+	};
+
+	const onClick = clientX => {
+		const {onClick, getTime} = context;
+
+		onClick({
+			type: 'time',
+			x: clientX,
+			time: getTime(clientX),
+		});
+	};
+
+	const clearScroll = () => {
+		setMoving(false);
+		decelerating.current = false;
+	};
 
 	/**
 	 * Animates values slowing down
 	 */
-	stepDecelAnim() {
-		if (!this.decelerating) {
+	const stepDecelAnim = () => {
+		if (!decelerating.current) {
 			return;
 		}
 
-		this.decVelX *= this.friction;
+		decVelX.current = decVelX.current * friction;
 
-		this.targetX += this.decVelX;
-
-		if (Math.abs(this.decVelX) > this.stopThreshold) {
-			this.onDrag({
-				distance: Math.abs(this.decVelX),
-				direction: this.decVelX < 0 ? 'future' : 'past',
+		if (Math.abs(decVelX.current) > stopThreshold) {
+			onDrag({
+				distance: Math.abs(decVelX.current),
+				direction: decVelX.current < 0 ? 'future' : 'past',
 			});
 
-			requestAnimFrame(this.stepDecelAnim.bind(this));
+			requestAnimFrame(stepDecelAnimRef.current);
 		} else {
-			this.clearScroll();
+			clearScroll();
 		}
-	}
+	};
 
-	clearScroll() {
-		this.setMoving(false);
-		this.decelerating = false;
-	}
+	const stepDecelAnimRef = useRef(stepDecelAnim);
 
-	onMouseLeave() {
-		const {onHover, updateContext} = this.context;
-		this._drag = false;
-		this._lastX = null;
-		this._mouseDownX = null;
-
-		onHover(null);
-
-		updateContext({
-			mouseX: null,
-			mouseTime: null,
-		});
-	}
+	//store animation callback to be able get actual context inside
+	useEffect(() => {
+		stepDecelAnimRef.current = stepDecelAnim;
+	}, [context.period]);
 
 	/**
-	 * Based on the amount of pixels the wheel moves update the size of the visible pixels.
-	 * @param e {SyntheticEvent}
-	 *
+	 * Initialize animation of values coming to a stop
 	 */
-	onWheel(e) {
-		const {dayWidth} = this.context;
-		e.preventDefault();
-		let change;
+	const startDecelAnim = () => {
+		const firstPoint = trackingPoints[0];
+		const lastPoint = trackingPoints[trackingPoints.length - 1];
 
-		if (e.deltaY > 0) {
-			// zoom out
-			change = 1 - Math.abs(e.deltaY / (10 * 100));
+		const xOffset = lastPoint.x - firstPoint.x;
+		const timeOffset = lastPoint.time - firstPoint.time;
+
+		const D = timeOffset / 15 / multiplier;
+
+		decVelX.current = xOffset / D || 0; // prevent NaN
+
+		//check difference start/stop
+		if (Math.abs(decVelX.current) > 1) {
+			decelerating.current = true;
+			requestAnimFrame(() => stepDecelAnimRef.current());
 		} else {
-			// zoom in
-			change = 1 + Math.abs(e.deltaY / (10 * 100));
+			clearScroll();
+		}
+	};
+
+	/**
+	 * Stops movement tracking, starts animation
+	 */
+	const stopTracking = () => {
+		addTrackingPoint(_pointerLastX);
+
+		startDecelAnim();
+	};
+
+	const onPointerUp = clientX => {
+		const isClick = Math.abs(_mouseDownX - clientX) < 1;
+		resetMouseTouchProps();
+		if (isClick) {
+			onClick(clientX);
 		}
 
-		let newDayWidth = dayWidth * change;
-		this.zoom(newDayWidth);
-	}
+		stopTracking();
+	};
 
-	onPinch(scale, point) {
-		const {vertical, dayWidth} = this.context;
-		let zoomX;
-		if (vertical) {
-			zoomX = point[1];
-		} else {
-			zoomX = point[0];
-		}
-
-		let change;
-		if (scale === 1) {
-			change = 1;
-		} else if (scale > 1) {
-			// zoom out
-			change = 1 + scale / 10;
-		} else {
-			// zoom in
-			change = 1 - scale / 10;
-		}
-
-		let newDayWidth = dayWidth * change;
-		this.zoom(newDayWidth, zoomX);
-	}
-
-	zoom(newDayWidth, x) {
+	const zoom = (newDayWidth, x) => {
 		const {
 			mouseX,
 			getTime,
@@ -642,7 +377,7 @@ class TimelineEventsWrapper extends PureComponent {
 			maxDayWidth,
 			minDayWidth,
 			width,
-		} = this.context;
+		} = context;
 		const zoomX = x || mouseX;
 		const centerX = width / 2;
 		const mouseTime = zoomX ? getTime(zoomX) : getTime(mouseX);
@@ -663,7 +398,6 @@ class TimelineEventsWrapper extends PureComponent {
 		let start;
 		let end;
 		let beforeMouseDays;
-
 		if (selectMode) {
 			beforeMouseDays = zoomX / newDayWidth;
 			start = moment(mouseTime).subtract(
@@ -713,7 +447,6 @@ class TimelineEventsWrapper extends PureComponent {
 				end.add(diff, 'ms');
 			}
 		}
-
 		updateContext({
 			period: {
 				start: start.toDate().toString(),
@@ -723,25 +456,287 @@ class TimelineEventsWrapper extends PureComponent {
 			//this option lock modify select time on zoom when periodLimitOnCenter is set to true.
 			lockCenter: periodLimitOnCenter,
 		});
-	}
+	};
 
-	render() {
-		const {children} = this.props;
-
-		return (
-			<div
-				className={'ptr-events-wrapper'}
-				ref={this.node}
-				onMouseLeave={this.onMouseLeave}
-				onMouseDown={this.onMouseDown}
-				onMouseUp={this.onMouseUp}
-				onMouseMove={this.onMouseMove}
-			>
-				{children}
-			</div>
+	const onMouseUp = e => {
+		const {vertical} = context;
+		const clientX = getPageXFromEvent(
+			e,
+			vertical,
+			node.current.getBoundingClientRect()
 		);
-	}
-}
+		onPointerUp(clientX);
+	};
+
+	const onMouseLeave = () => {
+		const {onHover, updateContext} = context;
+		set_drag(false);
+		set_lastX(null);
+		set_mouseDownX(null);
+
+		onHover(null);
+		updateContext({
+			mouseX: null,
+			mouseTime: null,
+		});
+	};
+
+	const onMouseDown = e => {
+		const {vertical} = context;
+		const clientX = getPageXFromEvent(
+			e,
+			vertical,
+			node.current.getBoundingClientRect()
+		);
+		onPointerDown(clientX);
+	};
+
+	const onMouseMove = e => {
+		const {vertical, getTime, updateContext, onHover, dayWidth} = context;
+		const clientX = getPageXFromEvent(
+			e,
+			vertical,
+			node.current.getBoundingClientRect()
+		);
+		const clientY = getPageYFromEvent(
+			e,
+			vertical,
+			node.current.getBoundingClientRect()
+		);
+		onHover({
+			x: e.pageX,
+			y: e.pageY,
+			clientX,
+			clientY,
+			time: getTime(clientX),
+			dayWidth,
+			vertical: vertical,
+		});
+		updateContext({
+			mouseX: clientX,
+			mouseTime: getTime(clientX).toDate(),
+		});
+
+		if (_drag) {
+			onPointerMove(clientX);
+			e.preventDefault();
+		}
+	};
+
+	const end_handler = ev => {
+		const {vertical} = context;
+
+		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
+		// ev.preventDefault();
+
+		const clientX = getPageXFromEvent(
+			ev,
+			vertical,
+			node.current.getBoundingClientRect()
+		);
+
+		//identify stop touch move by one touch
+		if (ev.changedTouches.length === 1 && tpCache.length === 1) {
+			onPointerUp(clientX);
+		}
+
+		//remove from cache by identifier
+		for (let i = 0; i < ev.changedTouches.length; i++) {
+			removeTouchEventByIdentifier(ev.changedTouches[i].identifier);
+		}
+
+		//FIX - sometime touchend or touchcancel is not called and touch stick in cache
+		if (ev.touches.length === 0 && tpCache.length > 0) {
+			clearTouchEventCache();
+		}
+	};
+
+	const start_handler = ev => {
+		const {vertical} = context;
+		// If the user makes simultaneious touches, the browser will fire a
+		// separate touchstart event for each touch point. Thus if there are
+		// three simultaneous touches, the first touchstart event will have
+		// targetTouches length of one, the second event will have a length
+		// of two, and so on.
+
+		// FIX comment ev.preventDefault(); for making touch "click" on overlay possible
+		// ev.preventDefault();
+
+		if (tpCache.length > 0) {
+			for (let i = 0; i < ev.touches.length; i++) {
+				removeTouchEventByIdentifier(ev.touches[i].identifier);
+			}
+		}
+		// Cache the touch points for later processing of 2-touch pinch/zoom
+		cacheEvents(ev.touches);
+
+		//identify only one touch
+		setTrackingPoints([]);
+		set_pointerLastX(null);
+		resetMouseTouchProps();
+		if (tpCache.length === 1) {
+			const clientX = getPageXFromEvent(
+				ev,
+				vertical,
+				node.current.getBoundingClientRect()
+			);
+			onPointerDown(clientX);
+		}
+	};
+
+	const onPinch = (scale, point) => {
+		const {vertical, dayWidth} = context;
+		let zoomX;
+		if (vertical) {
+			zoomX = point[1];
+		} else {
+			zoomX = point[0];
+		}
+
+		let change;
+		if (scale === 1) {
+			change = 1;
+		} else if (scale > 1) {
+			// zoom out
+			change = 1 + scale / 10;
+		} else {
+			// zoom in
+			change = 1 - scale / 10;
+		}
+		let newDayWidth = dayWidth * change;
+		zoom(newDayWidth, zoomX);
+	};
+
+	// This is a very basic 2-touch move/pinch/zoom handler that does not include
+	// error handling, only handles horizontal moves, etc.
+	const handle_pinch_zoom = touches => {
+		const cachedEvents = [];
+
+		for (let i = 0; i < touches.length; i++) {
+			const found = tpCache.findIndex(
+				e => e.identifier === touches[i].identifier
+			);
+			if (found > -1) {
+				cachedEvents[i] = found;
+			}
+		}
+
+		const prevPoint1 = tpCache[0];
+		const prevPoint2 = tpCache[1];
+		const point1 = getPoint(0, cachedEvents, tpCache, touches);
+		const point2 = getPoint(1, cachedEvents, tpCache, touches);
+		const prevDist = calculateEventDistance(prevPoint1, prevPoint2);
+		const dist = calculateEventDistance(point1, point2);
+
+		clearTouchEventCache();
+
+		// Cache the touch points for later processing of 2-touch pinch/zoom
+		cacheEvents([point1, point2]);
+		const targetBox = node.current.getBoundingClientRect();
+		const centerPoint = [
+			(point1.clientX + point2.clientX) / 2 - targetBox.left,
+			(point1.clientY + point2.clientY) / 2 - targetBox.top,
+		];
+		onPinch(dist / prevDist, centerPoint);
+	};
+
+	const move_handler = ev => {
+		const {vertical} = context;
+		ev.preventDefault();
+		//identify pinch/zoom touch
+		if (tpCache.length === 2) {
+			handle_pinch_zoom(ev.touches);
+		}
+
+		//identify touch by one touch
+		if (tpCache.length === 1) {
+			const clientX = getPageXFromEvent(
+				ev,
+				vertical,
+				node.current.getBoundingClientRect()
+			);
+			onPointerMove(clientX);
+
+			clearTouchEventCache();
+			// Cache the touch points for later processing
+			cacheEvents([ev.touches[0]]);
+		}
+	};
+
+	/**
+	 * Based on the amount of pixels the wheel moves update the size of the visible pixels.
+	 * @param e {SyntheticEvent}
+	 *
+	 */
+	const onWheel = e => {
+		const {dayWidth} = context;
+		e.preventDefault();
+		let change;
+
+		if (e.deltaY > 0) {
+			// zoom out
+			change = 1 - Math.abs(e.deltaY / (10 * 100));
+		} else {
+			// zoom in
+			change = 1 + Math.abs(e.deltaY / (10 * 100));
+		}
+
+		let newDayWidth = dayWidth * change;
+		zoom(newDayWidth);
+	};
+
+	const onWheelRef = useRef(onWheel);
+	const end_handlerRfe = useRef(end_handler);
+	const move_handlerRef = useRef(move_handler);
+	const start_handlerRef = useRef(start_handler);
+	useEffect(() => {
+		onWheelRef.current = onWheel;
+		end_handlerRfe.current = end_handler;
+		move_handlerRef.current = move_handler;
+		start_handlerRef.current = start_handler;
+	});
+
+	useEffect(() => {
+		const start_handlerCb = e => start_handlerRef.current(e);
+		node.current.addEventListener('touchstart', start_handlerCb);
+
+		const move_handlerCb = e => move_handlerRef.current(e);
+		node.current.addEventListener('touchmove', move_handlerCb);
+
+		const end_handlerCb = e => end_handlerRfe.current(e);
+		node.current.addEventListener('touchend', end_handlerCb);
+		node.current.addEventListener('touchcancel', end_handlerCb);
+		// fix bubling wheel event
+		// https://github.com/facebook/react/issues/14856#issuecomment-586781399
+
+		const onWheelCb = e => onWheelRef.current(e);
+		node.current.addEventListener('wheel', onWheelCb, {
+			passive: false,
+			capture: true,
+		});
+		return () => {
+			node?.current?.removeEventListener('touchstart', start_handlerCb);
+			node?.current?.removeEventListener('touchmove', move_handlerCb);
+
+			node?.current?.removeEventListener('touchend', end_handlerCb);
+			node?.current?.removeEventListener('touchcancel', end_handlerCb);
+			node?.current?.removeEventListener('wheel', onWheelCb);
+		};
+	}, []);
+
+	return (
+		<div
+			className={'ptr-events-wrapper'}
+			ref={node}
+			onMouseLeave={onMouseLeave}
+			onMouseDown={onMouseDown}
+			onMouseUp={onMouseUp}
+			onMouseMove={onMouseMove}
+		>
+			{children}
+		</div>
+	);
+};
 
 TimelineEventsWrapper.propTypes = {
 	children: PropTypes.node,

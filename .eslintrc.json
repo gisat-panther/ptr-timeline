@@ -1,5 +1,4 @@
 {
-	"parser": "@babel/eslint-parser",
 	"parserOptions": {
 		"ecmaVersion": 2020,
 		"sourceType": "module"
@@ -17,9 +16,7 @@
 			{
 				"endOfLine": "auto"
 			}
-		],
-		"no-debugger": "off",
-		"react/prefer-functional-component": "off"
+		]
 	},
 	"env": {
 		"browser": true,
@@ -30,5 +27,12 @@
 		"react": {
 			"version": "detect"
 		}
-	}
+	},
+	"ignorePatterns": [
+		"dist/*",
+		"lib/*",
+		"build/*",
+		"node_modules/*",
+		"package-lock.json"
+	]
 }

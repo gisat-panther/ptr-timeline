@@ -1,12 +1,15 @@
-import {PureComponent} from 'react';
+import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {withResizeDetector} from 'react-resize-detector';
+import {useResizeDetector} from 'react-resize-detector';
 
+import usePrevious from './hooks/usePrevious';
 import {ContextProvider} from './context';
 import TimelineContent from './TimelineContent';
 
 const CONTROLS_WIDTH = 0;
+
+const DEFAULT_SIZE = 100;
 
 export const LEVELS = [
 	{
@@ -34,133 +37,118 @@ export const LEVELS = [
 const DEFAULT_VERTICAL_HEIGHT = 70;
 const DEFAULT_HORIZONTAL_HEIGHT = 45;
 
-class Timeline extends PureComponent {
-	static propTypes = {
-		centerTime: PropTypes.object,
-		children: PropTypes.node,
-		contentHeight: PropTypes.number,
-		dayWidth: PropTypes.number,
-		height: PropTypes.number,
-		levels: PropTypes.arrayOf(
-			PropTypes.shape({
-				end: PropTypes.number,
-				level: PropTypes.string,
-			})
-		), //ordered levels by higher level.end
-		onChange: PropTypes.func,
-		onClick: PropTypes.func,
-		onHover: PropTypes.func,
-		period: PropTypes.shape({
-			end: PropTypes.string,
-			start: PropTypes.string,
-		}),
-		periodLimit: PropTypes.shape({
-			end: PropTypes.string,
-			start: PropTypes.string,
-		}).isRequired,
-		periodLimitOnCenter: PropTypes.bool,
-		selectMode: PropTypes.bool, //whether change time while zoom
-		time: PropTypes.object,
-		vertical: PropTypes.bool,
-		width: PropTypes.number,
+const Timeline = ({
+	centerTime,
+	children,
+	contentHeight,
+	dayWidth = 1.5,
+	// height = 100,
+	levels = LEVELS,
+	onChange,
+	onClick = () => {},
+	onHover = () => {},
+	period,
+	periodLimit,
+	periodLimitOnCenter,
+	selectMode = false,
+	time,
+	vertical,
+	// width = 100,
+}) => {
+	// constructor(props) {
+	// 	super(props);
+
+	// 	this.updateContext = this.updateContext.bind(this);
+	// 	this.getX = this.getX.bind(this);
+	// 	this.getTime = this.getTime.bind(this);
+	// 	this.getActiveLevel = this.getActiveLevel.bind(this);
+
+	// const size = useResizeDetector();
+	const {ref, ...size} = useResizeDetector({
+		refreshMode: 'debounce',
+		refreshRate: 300,
+		refreshOptions: {trailing: true},
+	});
+	const width = size.width || 100;
+	const height = size.height || 100;
+	const prevTime = usePrevious(time);
+	const prevDayWidth = usePrevious(dayWidth);
+	const prevPeriodLimit = usePrevious(periodLimit);
+	const prevWidth = usePrevious(width);
+	const prevHeight = usePrevious(height);
+
+	const getXAxisWidth = () => {
+		const XAxisWidth = vertical
+			? ref?.current?.getBoundingClientRect().height
+			: ref?.current?.getBoundingClientRect().width;
+
+		return XAxisWidth || DEFAULT_SIZE;
 	};
 
-	static defaultProps = {
-		dayWidth: 1.5,
-		levels: LEVELS,
-		onHover: () => {},
-		onClick: () => {},
-		width: 100,
-		height: 100,
-		selectMode: false,
+	const getPeriodLimitByDayWidth = dayWidth => {
+		const allDays = getXAxisWidth() / dayWidth;
+		const halfMouseDays = allDays / 2;
+
+		const start = moment(centerTime)
+			.subtract(moment.duration(halfMouseDays * (60 * 60 * 24 * 1000), 'ms'))
+			.toDate()
+			.toString();
+		const end = moment(centerTime)
+			.add(moment.duration(halfMouseDays * (60 * 60 * 24 * 1000), 'ms'))
+			.toDate()
+			.toString();
+		return {
+			start,
+			end,
+		};
 	};
 
-	constructor(props) {
-		super(props);
+	const getMaxDayWidth = (forLevels = levels) => {
+		const lastLevel = forLevels[forLevels.length - 1];
+		const maxDayWidth = lastLevel.end;
+		return maxDayWidth;
+	};
 
-		this.updateContext = this.updateContext.bind(this);
-		this.getX = this.getX.bind(this);
-		this.getTime = this.getTime.bind(this);
-		this.getActiveLevel = this.getActiveLevel.bind(this);
+	const getDayWidthForPeriod = (
+		periodLimit,
+		axesWidth,
+		maxDayWidth = getMaxDayWidth()
+	) => {
+		const start = moment(periodLimit.start);
+		const end = moment(periodLimit.end);
 
-		const state = this.getStateUpdate({
-			periodLimit: props.periodLimit,
-			period: props.period || props.periodLimit,
-			centerTime: props.time,
-		});
+		const diff = end.diff(start, 'ms');
+		const diffDays = diff / (60 * 60 * 24 * 1000);
 
-		this.state = state;
-
-		if (typeof props.onChange === 'function') {
-			props.onChange(this.state);
-		}
-	}
-
-	componentDidUpdate(prevProps) {
-		const {dayWidth, time, width, height, periodLimit} = this.props;
-
-		const timeHasChanged =
-			prevProps.time &&
-			time &&
-			prevProps.time.toString() !== time.toString() &&
-			this.state.centerTime.toString() !== time.toString();
-
-		//if parent component set dayWidth
-		if (
-			prevProps.dayWidth !== dayWidth &&
-			this.state.dayWidth !== dayWidth &&
-			!timeHasChanged
-		) {
-			this.updateContext({dayWidth, centerTime: time});
+		let dayWidth = (axesWidth - CONTROLS_WIDTH) / diffDays;
+		if (dayWidth > maxDayWidth) {
+			dayWidth = maxDayWidth;
 		}
 
-		//if parent component set time
-		if (timeHasChanged) {
-			const xAxis = this.getXAxisWidth();
-			const period = this.getPeriodLimitByTime(
-				time,
-				xAxis,
-				this.state.periodLimit,
-				dayWidth
-			);
-			//zoom to dayWidth
-			this.updateContext({period, centerTime: time});
-		}
+		return dayWidth;
+	};
 
-		if (prevProps.periodLimit !== periodLimit) {
-			this.updateContext({period: periodLimit, periodLimit});
-		}
+	//Find first level with smaller start level.
+	const getActiveLevel = dayWidth => {
+		return levels.find(l => dayWidth <= l.end);
+	};
 
-		//if parent component set time
-		if (prevProps.width !== width || prevProps.height !== height) {
-			//přepočítat day width aby bylo v periodě
+	const getTime = (
+		x,
+		dayWidth = state.dayWidth,
+		startTime = state.period.start
+	) => {
+		let diffDays = x / dayWidth;
+		let diff = diffDays * (60 * 60 * 24 * 1000);
+		return moment(startTime).add(moment.duration(diff, 'ms'));
+	};
 
-			//todo take time from state
-			// const period = this.getPeriodLimitByTime(time);
-			const xAxis = this.getXAxisWidth();
-			const minPeriodDayWidth = this.getDayWidthForPeriod(periodLimit, xAxis);
-			let dayWidth = this.state.dayWidth;
-			if (minPeriodDayWidth >= this.state.dayWidth) {
-				dayWidth = minPeriodDayWidth;
-			}
-			const period = this.getPeriodLimitByTime(
-				this.state.centerTime,
-				xAxis,
-				periodLimit,
-				dayWidth
-			);
-
-			//zoom to dayWidth
-			this.updateContext({period});
-		}
-	}
-
-	getPeriodLimitByTime(
+	const getPeriodLimitByTime = (
 		time,
-		axesWidth = this.getXAxisWidth(),
-		periodLimit = this.state.periodLimit,
-		dayWidth = this.state.dayWidth
-	) {
+		axesWidth = getXAxisWidth(),
+		periodLimit = state.periodLimit, //fixme
+		dayWidth = state.dayWidth //fixme
+	) => {
 		const allDays = axesWidth / dayWidth;
 		let setTime = moment(time);
 
@@ -186,84 +174,9 @@ class Timeline extends PureComponent {
 			start,
 			end,
 		};
-	}
+	};
 
-	getX(date) {
-		date = moment(date);
-		let diff = date.unix() - moment(this.state.period.start).unix();
-		let diffDays = diff / (60 * 60 * 24);
-		return diffDays * this.state.dayWidth;
-	}
-
-	getTime(
-		x,
-		dayWidth = this.state.dayWidth,
-		startTime = this.state.period.start
-	) {
-		let diffDays = x / dayWidth;
-		let diff = diffDays * (60 * 60 * 24 * 1000);
-		return moment(startTime).add(moment.duration(diff, 'ms'));
-	}
-
-	//Find first level with smaller start level.
-	getActiveLevel(dayWidth) {
-		const {levels} = this.props;
-		return levels.find(l => dayWidth <= l.end);
-	}
-
-	getDayWidthForPeriod(
-		periodLimit,
-		axesWidth,
-		maxDayWidth = this.getMaxDayWidth()
-	) {
-		const start = moment(periodLimit.start);
-		const end = moment(periodLimit.end);
-
-		const diff = end.diff(start, 'ms');
-		const diffDays = diff / (60 * 60 * 24 * 1000);
-
-		let dayWidth = (axesWidth - CONTROLS_WIDTH) / diffDays;
-		if (dayWidth > maxDayWidth) {
-			dayWidth = maxDayWidth;
-		}
-
-		return dayWidth;
-	}
-
-	getPeriodLimitByDayWidth(dayWidth) {
-		const {centerTime} = this.state;
-
-		const allDays = this.getXAxisWidth() / dayWidth;
-		const halfMouseDays = allDays / 2;
-
-		const start = moment(centerTime)
-			.subtract(moment.duration(halfMouseDays * (60 * 60 * 24 * 1000), 'ms'))
-			.toDate()
-			.toString();
-		const end = moment(centerTime)
-			.add(moment.duration(halfMouseDays * (60 * 60 * 24 * 1000), 'ms'))
-			.toDate()
-			.toString();
-		return {
-			start,
-			end,
-		};
-	}
-
-	updateContext(options) {
-		if (options) {
-			const stateUpdate = this.getStateUpdate(options);
-			this.setState(stateUpdate, () => {
-				if (typeof this.props.onChange === 'function') {
-					this.props.onChange(this.state);
-				}
-			});
-		}
-	}
-
-	getStateUpdate(options) {
-		const {levels, periodLimit} = this.props;
-
+	const getStateUpdate = options => {
 		if (options) {
 			const updateContext = {};
 			Object.assign(updateContext, {...options});
@@ -271,24 +184,20 @@ class Timeline extends PureComponent {
 			//on change dayWidth calculate period
 			if (options.dayWidth) {
 				Object.assign(updateContext, {
-					period: this.getPeriodLimitByDayWidth(options.dayWidth),
+					period: getPeriodLimitByDayWidth(options.dayWidth),
 				});
 			}
 
 			//on change period calculate dayWidth
 			if (options.period) {
 				Object.assign(updateContext, {
-					dayWidth: this.getDayWidthForPeriod(
-						options.period,
-						this.getXAxisWidth()
-					),
+					dayWidth: getDayWidthForPeriod(options.period, getXAxisWidth()),
 				});
 			}
 
 			if (updateContext.dayWidth) {
 				Object.assign(updateContext, {
-					activeLevel: this.getActiveLevel(updateContext.dayWidth, levels)
-						.level,
+					activeLevel: getActiveLevel(updateContext.dayWidth, levels).level,
 				});
 			}
 
@@ -298,8 +207,8 @@ class Timeline extends PureComponent {
 				!options.lockCenter
 			) {
 				Object.assign(updateContext, {
-					centerTime: this.getTime(
-						this.getXAxisWidth() / 2,
+					centerTime: getTime(
+						getXAxisWidth() / 2,
 						updateContext.dayWidth,
 						updateContext.period.start
 					).toDate(),
@@ -308,9 +217,9 @@ class Timeline extends PureComponent {
 
 			if (options.centerTime && !updateContext.period) {
 				Object.assign(updateContext, {
-					period: this.getPeriodLimitByTime(
+					period: getPeriodLimitByTime(
 						options.centerTime,
-						this.getXAxisWidth(),
+						getXAxisWidth(),
 						periodLimit,
 						updateContext.dayWidth
 					),
@@ -328,80 +237,198 @@ class Timeline extends PureComponent {
 		} else {
 			return {};
 		}
-	}
+	};
 
-	getMaxDayWidth(levels = this.props.levels) {
-		const lastLevel = levels[levels.length - 1];
-		const maxDayWidth = lastLevel.end;
-		return maxDayWidth;
-	}
+	const [state, setState] = useState(
+		getStateUpdate({
+			periodLimit: periodLimit,
+			period: period || periodLimit,
+			centerTime: time,
+		})
+	);
 
-	getXAxisWidth() {
-		//fix ReactResizeDetector.
-		const {width, height, vertical} = this.props;
-		return vertical ? height : width;
-	}
+	useEffect(() => {
+		if (typeof onChange === 'function') {
+			// fixme test if state is defined
+			onChange(state);
+		}
+	}, []);
 
-	getContentHeight() {
-		const {contentHeight, vertical} = this.props;
+	useEffect(() => {
+		// const {dayWidth, time, width, height, periodLimit} = this.props;
+		const timeHasChanged =
+			prevTime &&
+			time &&
+			prevTime.toString() !== time.toString() &&
+			state.centerTime.toString() !== time.toString();
+
+		//if parent component set dayWidth
+		if (
+			prevDayWidth !== dayWidth &&
+			state.dayWidth !== dayWidth &&
+			!timeHasChanged
+		) {
+			updateContext({dayWidth, centerTime: time});
+		}
+
+		//if parent component set time
+		if (timeHasChanged) {
+			const xAxis = getXAxisWidth();
+			const period = getPeriodLimitByTime(
+				time,
+				xAxis,
+				state.periodLimit,
+				dayWidth
+			);
+			//zoom to dayWidth
+			updateContext({period, centerTime: time});
+		}
+
+		if (prevPeriodLimit !== periodLimit) {
+			updateContext({period: periodLimit, periodLimit});
+		}
+
+		//if parent component set time
+		if (prevWidth !== width || prevHeight !== height) {
+			//přepočítat day width aby bylo v periodě
+
+			//todo take time from state
+			// const period = this.getPeriodLimitByTime(time);
+			const xAxis = getXAxisWidth();
+			const minPeriodDayWidth = getDayWidthForPeriod(periodLimit, xAxis);
+			let dayWidth = state.dayWidth;
+			if (minPeriodDayWidth >= state.dayWidth) {
+				dayWidth = minPeriodDayWidth;
+			}
+			const period = getPeriodLimitByTime(
+				state.centerTime,
+				xAxis,
+				periodLimit,
+				dayWidth
+			);
+
+			//zoom to dayWidth
+			updateContext({period});
+		}
+	}, [time, dayWidth, periodLimit, width, height]);
+
+	const getX = date => {
+		date = moment(date);
+		let diff = date.unix() - moment(state.period.start).unix();
+		let diffDays = diff / (60 * 60 * 24);
+		return diffDays * state.dayWidth;
+	};
+
+	const updateContext = options => {
+		if (options && height && width) {
+			const stateUpdate = getStateUpdate(options);
+			// setState(stateUpdate, () => {
+			// 	if (typeof this.props.onChange === 'function') {
+			// 		this.props.onChange(this.state);
+			// 	}
+			// });
+			setState({
+				...state,
+				...stateUpdate,
+			});
+
+			// FIXME test
+			if (typeof onChange === 'function') {
+				onChange({
+					...state,
+					...stateUpdate,
+				});
+			}
+		}
+	};
+
+	const getContentHeight = () => {
 		return (
 			contentHeight ||
 			(vertical ? DEFAULT_VERTICAL_HEIGHT : DEFAULT_HORIZONTAL_HEIGHT)
 		);
-	}
+	};
 
-	render() {
-		const {
-			levels,
-			periodLimit,
-			onHover,
-			onClick,
-			vertical,
-			children,
-			periodLimitOnCenter,
-			selectMode,
-		} = this.props;
-		const {dayWidth, period, mouseX, moving} = this.state;
+	// render() {
+	// 	const {
+	// 		levels,
+	// 		periodLimit,
+	// 		onHover,
+	// 		onClick,
+	// 		vertical,
+	// 		children,
+	// 		periodLimitOnCenter,
+	// 		selectMode,
+	// 	} = this.props;
+	const {dayWidth: stateDayWidth, period: statePeriod, mouseX, moving} = state;
 
-		const maxDayWidth = this.getMaxDayWidth();
-		const activeDayWidth = dayWidth >= maxDayWidth ? maxDayWidth : dayWidth;
-		const activeLevel = this.getActiveLevel(activeDayWidth, levels).level;
-		const minDayWidth = this.getDayWidthForPeriod(
-			periodLimit,
-			this.getXAxisWidth()
-		);
-		return (
-			<div className="ptr-timeline">
-				<ContextProvider
-					value={{
-						updateContext: this.updateContext,
-						width: this.getXAxisWidth(),
-						height: this.getContentHeight(),
-						getX: this.getX,
-						getTime: this.getTime,
-						centerTime: this.state.centerTime,
-						getActiveLevel: this.getActiveLevel,
-						dayWidth,
-						maxDayWidth,
-						minDayWidth,
-						periodLimit,
-						period,
-						mouseX,
-						activeLevel,
-						periodLimitVisible: true,
-						onClick,
-						onHover,
-						vertical,
-						periodLimitOnCenter,
-						selectMode,
-						moving,
-					}}
-				>
-					<TimelineContent>{children}</TimelineContent>
-				</ContextProvider>
-			</div>
-		);
-	}
-}
+	const maxDayWidth = getMaxDayWidth();
+	const activeDayWidth =
+		stateDayWidth >= maxDayWidth ? maxDayWidth : stateDayWidth;
+	const activeLevel = getActiveLevel(activeDayWidth, levels).level;
+	const minDayWidth = getDayWidthForPeriod(periodLimit, getXAxisWidth());
+	return (
+		<div className="ptr-timeline" ref={ref}>
+			<ContextProvider
+				value={{
+					updateContext,
+					width: getXAxisWidth(),
+					height: getContentHeight(),
+					getX: getX,
+					getTime: getTime,
+					centerTime: state.centerTime,
+					getActiveLevel: getActiveLevel,
+					dayWidth: stateDayWidth,
+					maxDayWidth,
+					minDayWidth,
+					periodLimit,
+					period: statePeriod,
+					mouseX,
+					activeLevel,
+					periodLimitVisible: true,
+					onClick,
+					onHover,
+					vertical,
+					periodLimitOnCenter,
+					selectMode,
+					moving,
+				}}
+			>
+				<TimelineContent>{children}</TimelineContent>
+			</ContextProvider>
+		</div>
+	);
+};
 
-export default withResizeDetector(Timeline);
+Timeline.propTypes = {
+	centerTime: PropTypes.object,
+	children: PropTypes.node,
+	contentHeight: PropTypes.number,
+	dayWidth: PropTypes.number,
+	height: PropTypes.number,
+	levels: PropTypes.arrayOf(
+		PropTypes.shape({
+			end: PropTypes.number,
+			level: PropTypes.string,
+		})
+	), //ordered levels by higher level.end
+	onChange: PropTypes.func,
+	onClick: PropTypes.func,
+	onHover: PropTypes.func,
+	period: PropTypes.shape({
+		end: PropTypes.string,
+		start: PropTypes.string,
+	}),
+	periodLimit: PropTypes.shape({
+		end: PropTypes.string,
+		start: PropTypes.string,
+	}).isRequired,
+	periodLimitOnCenter: PropTypes.bool,
+	selectMode: PropTypes.bool, //whether change time while zoom
+	time: PropTypes.object,
+	vertical: PropTypes.bool,
+	width: PropTypes.number,
+};
+
+// export default withResizeDetector(Timeline);
+export default Timeline;
