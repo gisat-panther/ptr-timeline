@@ -7,7 +7,7 @@ const path = require('path'),
 glob("src/**/*.*(scss|css)", {}, function (er, files) {
 	files.forEach(function (file) {
 		const parsedPath = path.parse(file);
-		const relativePath = parsedPath.dir.split("src/")[1];
+		const relativePath = parsedPath.dir.split("src/")[1] || '';
 		const basePath = parsedPath.base;
 		
 		if (!fs.existsSync(`lib/${relativePath}`)) {
