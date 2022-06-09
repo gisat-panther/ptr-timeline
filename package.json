@@ -1,6 +1,6 @@
 {
 	"name": "@gisatcz/ptr-timeline",
-	"version": "0.1.13-0",
+	"version": "0.1.13-1",
 	"description": "Panther timeline React component",
 	"sideEffects": false,
 	"keywords": [
