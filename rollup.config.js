@@ -3,7 +3,6 @@ import path from 'path';
 import commonjs from '@rollup/plugin-commonjs';
 import filesize from 'rollup-plugin-filesize';
 import postcss from 'rollup-plugin-postcss';
-import postcssUrl from './scripts/plugins/postcssUrl';
 
 const env = process.env.NODE_ENV;
 const pkg = require('./package.json');
@@ -37,12 +36,14 @@ export default {
 		'classnames',
 		'prop-types',
 		'moment',
+		'postcss-url',
+		'rollup-plugin-postcss',
 		/@babel\/runtime/,
 		...lodashExternal,
 	],
 	output: {
 		file: {
-			es: pkg.module,
+			es: 'dist/index.es.js',
 			cjs: pkg.main,
 		}[env],
 		format: env,
@@ -63,13 +64,6 @@ export default {
 		}),
 		postcss({
 			extract: path.resolve(Paths.DIST + '/style.css'),
-			plugins: [
-				...postcssUrl({
-					basePath: [Paths.SRC, Paths.NODE_MODULES],
-					assetsPath: Paths.DIST + '/assets',
-					dest: Paths.DIST,
-				}),
-			],
 		}),
 		filesize(),
 	],

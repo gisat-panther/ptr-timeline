@@ -1,25 +1,15 @@
 import {isValidElement, Children, cloneElement} from 'react';
-import {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 
 import hoverContext from './HoverHandler/context';
+import {useContext} from 'react';
 
-class TimelineHover extends PureComponent {
-	static propTypes = {
-		getHoverContent: PropTypes.func,
-		children: PropTypes.node,
-	};
+const TimelineHover = ({getHoverContent, children}) => {
+	const context = useContext(hoverContext);
 
-	static contextType = hoverContext;
-	constructor(props) {
-		super(props);
-		this.onHover = this.onHover.bind(this);
-	}
-
-	onHover(evt) {
+	const onHover = evt => {
 		const popupContent =
-			(evt && this.props.getHoverContent(evt.x, evt.time, evt, this.context)) ||
-			null;
+			(evt && getHoverContent(evt.x, evt.time, evt, context)) || null;
 		if (
 			popupContent &&
 			(isValidElement(popupContent) || popupContent?.popup?.content)
@@ -29,7 +19,7 @@ class TimelineHover extends PureComponent {
 				x: evt.x,
 				y: evt.y,
 			};
-			this.context.onHover([hoverItem], {
+			context.onHover([hoverItem], {
 				popup: {
 					x: evt.x,
 					y: evt.y,
@@ -37,17 +27,20 @@ class TimelineHover extends PureComponent {
 				},
 			});
 		} else {
-			this.context.onHoverOut();
+			context.onHoverOut();
 		}
-	}
+	};
 
-	render() {
-		const children = Children.map(this.props.children, child =>
-			cloneElement(child, {...child.props, onHover: this.onHover})
-		);
+	const childrenElms = Children.map(children, child =>
+		cloneElement(child, {...child.props, onHover: onHover})
+	);
 
-		return <>{children}</>;
-	}
-}
+	return <>{childrenElms}</>;
+};
+
+TimelineHover.propTypes = {
+	getHoverContent: PropTypes.func,
+	children: PropTypes.node,
+};
 
 export default TimelineHover;
