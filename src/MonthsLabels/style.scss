@@ -4,6 +4,10 @@
 	stroke: none;
 	fill: var(--accent30);
 	font-size: $a0;
+	
+	&.large{
+		font-size: 0.85rem;
+	}
 }
 
 .ptr-timeline-month.background > line {

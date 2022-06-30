@@ -9,6 +9,8 @@ import Years from './Years';
 import YearsLabels from './YearsLabels';
 import Months from './Months';
 import MonthsLabels from './MonthsLabels';
+import Days from './Days';
+import DaysLabels from './DaysLabels';
 import TimeLineHover from './TimeLineHover';
 import HoverHandler from './HoverHandler/HoverHandler';
 import * as position from './HoverHandler/position';
@@ -16,6 +18,8 @@ import * as position from './HoverHandler/position';
 import utils from './utils';
 
 export {
+	Days,
+	DaysLabels,
 	Timeline,
 	MapTimeline,
 	MapTimelineLegend,

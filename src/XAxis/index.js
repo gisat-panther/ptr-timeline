@@ -3,6 +3,7 @@ import {createElement} from 'react';
 import {withResizeDetector} from 'react-resize-detector';
 import YearsLabels from '../YearsLabels';
 import MonthsLabels from '../MonthsLabels';
+import DaysLabels from '../DaysLabels';
 
 import './style.scss';
 
@@ -15,6 +16,11 @@ const Levels = props => {
 			return [
 				createElement(MonthsLabels, {...props, key: 'month'}),
 				createElement(YearsLabels, {...props, key: 'year'}),
+			];
+		case 'day':
+			return [
+				createElement(DaysLabels, {...props, key: 'day'}),
+				createElement(MonthsLabels, {...props, key: 'month'}),
 			];
 	}
 	return null;

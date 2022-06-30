@@ -6,10 +6,16 @@ import utils from '../utils';
 import './style.scss';
 
 const MonthsLabel = props => {
-	const {period, getX, height, vertical} = props;
+	const {period, getX, height, vertical, dayWidth} = props;
 	const periodStart = moment(period.start);
 	const periodEnd = moment(period.end);
 	const monthsCfg = utils.interval.getMonths(periodStart, periodEnd);
+
+	let className = 'ptr-timeline-month-label';
+	if (dayWidth > 30) {
+		className = `${className} large`;
+	}
+
 	const months = _map(monthsCfg, month => {
 		if (month.month !== '01') {
 			const labelXCorrection = -3;
@@ -19,7 +25,7 @@ const MonthsLabel = props => {
 				vertical,
 				x,
 				height,
-				className: 'ptr-timeline-month-label',
+				className,
 			});
 			return (
 				<g
