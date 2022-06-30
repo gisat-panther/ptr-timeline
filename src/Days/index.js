@@ -3,13 +3,12 @@ import './style.scss';
 import {map as _map} from 'lodash';
 import moment from 'moment';
 import {getYears, getMonths, getDays, getHours} from '../utils/interval';
-import Label from '../utils/textLabel';
-import HourDash from '../hours/HourDash';
+import HourDash from '../Hours/HourDash';
 import DayDash from './DayDash';
 import MonthDash from '../Months/MonthDash';
 import YearDash from '../Years/YearDash';
 
-const Days = ({period, getX, dayWidth, height, vertical}) => {
+const Days = ({period, getX, dayWidth, vertical}) => {
 	const periodStart = moment(period.start);
 	const periodEnd = moment(period.end);
 	const daysCfg = getDays(periodStart, periodEnd);
@@ -19,20 +18,11 @@ const Days = ({period, getX, dayWidth, height, vertical}) => {
 	const months = _map(monthsCfg, month => {
 		if (month.month !== '01') {
 			let x = getX(month.start);
-			let label = (
-				<Label
-					label={month.month}
-					vertical={vertical}
-					x={x}
-					height={height}
-					className={'ptr-timeline-month-label'}
-				/>
-			);
+
 			return (
 				<MonthDash
 					key={`${month.year}-${month.month}`}
 					x={x}
-					label={label}
 					vertical={vertical}
 					height={1}
 				/>
@@ -44,36 +34,16 @@ const Days = ({period, getX, dayWidth, height, vertical}) => {
 
 	const years = _map(yearsCfg, year => {
 		let x = getX(year.start);
-		let label = (
-			<Label
-				label={year.year}
-				vertical={vertical}
-				x={x}
-				height={height}
-				className={'ptr-timeline-year-label'}
-			/>
-		);
-		return <YearDash key={year.year} label={label} x={x} vertical={vertical} />;
+
+		return <YearDash key={year.year} x={x} vertical={vertical} />;
 	});
 
 	const days = _map(daysCfg, day => {
 		let x = getX(day.start);
-		let label = null;
-		if (dayWidth > 17) {
-			label = (
-				<Label
-					label={day.day}
-					vertical={vertical}
-					x={x}
-					height={height}
-					className={'ptr-timeline-day-label'}
-				/>
-			);
-		}
+
 		return (
 			<DayDash
 				key={`${day.year}-${day.month}-${day.day}`}
-				label={label}
 				x={x}
 				vertical={vertical}
 				height={2}

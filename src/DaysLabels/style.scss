@@ -1,10 +1,9 @@
 @import '~@gisatcz/ptr-core/lib/styles/_variables';
 
-g.ptr-timeline-day,
-.ptr-timeline-day > line {
-	stroke-width: 1;
-	stroke: var(--accent20);
-	fill: var(--base10);
+.ptr-timeline-day-label {
+	stroke: none;
+	fill: var(--accent30);
+	font-size: $a0;
 }
 
 .ptr-timeline-day.background > line {
