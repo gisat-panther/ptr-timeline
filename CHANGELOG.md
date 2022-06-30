@@ -1,3 +1,15 @@
+# v0.2.0 (Mon Jun 27 2022)
+
+#### 🚀 Enhancement
+
+- :sparkles: [#35](https://github.com/gisat-panther/ptr-timeline/pull/35) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.1.12 (Tue Apr 12 2022)
 
 #### 🐾 Patch
