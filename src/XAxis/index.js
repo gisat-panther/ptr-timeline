@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import {createElement} from 'react';
-import {withResizeDetector} from 'react-resize-detector';
 import YearsLabels from '../YearsLabels';
 import MonthsLabels from '../MonthsLabels';
 import DaysLabels from '../DaysLabels';
@@ -51,4 +50,4 @@ XAxis.propTypes = {
 	vertical: PropTypes.bool,
 };
 
-export default withResizeDetector(XAxis);
+export default XAxis;

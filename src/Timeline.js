@@ -53,7 +53,8 @@ const Timeline = ({
 	selectMode = false,
 	time,
 	vertical,
-	// width = 100,
+	onResize,
+	width,
 }) => {
 	// constructor(props) {
 	// 	super(props);
@@ -68,13 +69,14 @@ const Timeline = ({
 		refreshMode: 'debounce',
 		refreshRate: 300,
 		refreshOptions: {trailing: true},
+		...(onResize ? {onResize} : {}),
 	});
-	const width = size.width || 100;
+	const widthSelf = width || size.width;
 	const height = size.height || 100;
 	const prevTime = usePrevious(time);
 	const prevDayWidth = usePrevious(dayWidth);
 	const prevPeriodLimit = usePrevious(periodLimit);
-	const prevWidth = usePrevious(width);
+	const prevWidth = usePrevious(widthSelf);
 	const prevHeight = usePrevious(height);
 
 	const getXAxisWidth = () => {
@@ -289,7 +291,7 @@ const Timeline = ({
 		}
 
 		//if parent component set time
-		if (prevWidth !== width || prevHeight !== height) {
+		if (prevWidth !== widthSelf || prevHeight !== height) {
 			//přepočítat day width aby bylo v periodě
 
 			//todo take time from state
@@ -310,7 +312,7 @@ const Timeline = ({
 			//zoom to dayWidth
 			updateContext({period});
 		}
-	}, [time, dayWidth, periodLimit, width, height]);
+	}, [time, dayWidth, periodLimit, widthSelf, height]);
 
 	const getX = date => {
 		date = moment(date);
@@ -320,7 +322,7 @@ const Timeline = ({
 	};
 
 	const updateContext = options => {
-		if (options && height && width) {
+		if (options && height && widthSelf) {
 			const stateUpdate = getStateUpdate(options);
 			// setState(stateUpdate, () => {
 			// 	if (typeof this.props.onChange === 'function') {
@@ -368,7 +370,7 @@ const Timeline = ({
 	const activeLevel = getActiveLevel(activeDayWidth, levels).level;
 	const minDayWidth = getDayWidthForPeriod(periodLimit, getXAxisWidth());
 	return (
-		<div className="ptr-timeline" ref={ref}>
+		<div className="ptr-timeline" ref={ref} style={{width: widthSelf}}>
 			<ContextProvider
 				value={{
 					updateContext,
@@ -428,6 +430,7 @@ Timeline.propTypes = {
 	time: PropTypes.object,
 	vertical: PropTypes.bool,
 	width: PropTypes.number,
+	onResize: PropTypes.func,
 };
 
 // export default withResizeDetector(Timeline);

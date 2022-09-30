@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState, Children} from 'react';
 import PropTypes from 'prop-types';
-import ReactResizeDetector from 'react-resize-detector';
 
 import {utils} from '@gisatcz/ptr-utils';
 
@@ -126,24 +125,31 @@ const MapTimeline = ({
 		}
 	};
 
+	const onResize = width => {
+		setTimelineWidth(width);
+	};
+
 	return (
 		<div ref={wrapperRef}>
-			<div className={'ptr-timeline-x-axe'}>
-				<div className={'ptr-timeline-legend-placeholder'}></div>
-				<Timeline
-					time={timelineState.time}
-					dayWidth={timelineState.dayWidth}
-					periodLimit={periodLimit}
-					periodLimitOnCenter={periodLimitOnCenter}
-					onChange={onChange}
-					vertical={vertical}
-					levels={levels}
-					contentHeight={28}
-					selectMode={selectMode}
-				>
-					<XAxis key={'maptimeline-xaxis'} />
-				</Timeline>
-			</div>
+			{timelineWidth ? (
+				<div className={'ptr-timeline-x-axe'}>
+					<div className={'ptr-timeline-legend-placeholder'}></div>
+					<Timeline
+						time={timelineState.time}
+						dayWidth={timelineState.dayWidth}
+						periodLimit={periodLimit}
+						periodLimitOnCenter={periodLimitOnCenter}
+						onChange={onChange}
+						vertical={vertical}
+						levels={levels}
+						contentHeight={28}
+						selectMode={selectMode}
+						width={timelineWidth}
+					>
+						<XAxis key={'maptimeline-xaxis'} />
+					</Timeline>
+				</div>
+			) : null}
 
 			<div
 				className={'ptr-maptimeline-scrollable'}
@@ -154,36 +160,29 @@ const MapTimeline = ({
 						<LegendComponent layers={layers} />
 					) : null}
 					<div className={'ptr-maptimeline-wrapper'}>
-						<ReactResizeDetector
-							handleWidth
-							skipOnMount={false}
-							onResize={setTimelineWidth}
-						>
-							{timelineWidth ? (
-								<HoverHandler getStyle={getHorizontalTootlipStyle()}>
-									<TimeLineHover getHoverContent={getHoverContent}>
-										<Timeline
-											dayWidth={timelineState.dayWidth}
-											time={timelineState.time}
-											periodLimit={periodLimit}
-											periodLimitOnCenter={periodLimitOnCenter}
-											onChange={onChange}
-											onHover={onHover}
-											onClick={onClick}
-											vertical={vertical}
-											levels={levels}
-											contentHeight={Math.max(
-												contentHeightByLayers,
-												minTimelineHeight
-											)}
-											selectMode={selectMode}
-										>
-											{childArray}
-										</Timeline>
-									</TimeLineHover>
-								</HoverHandler>
-							) : null}
-						</ReactResizeDetector>
+						<HoverHandler getStyle={getHorizontalTootlipStyle()}>
+							<TimeLineHover getHoverContent={getHoverContent}>
+								<Timeline
+									dayWidth={timelineState.dayWidth}
+									time={timelineState.time}
+									periodLimit={periodLimit}
+									periodLimitOnCenter={periodLimitOnCenter}
+									onChange={onChange}
+									onHover={onHover}
+									onClick={onClick}
+									vertical={vertical}
+									levels={levels}
+									contentHeight={Math.max(
+										contentHeightByLayers,
+										minTimelineHeight
+									)}
+									selectMode={selectMode}
+									onResize={onResize}
+								>
+									{childArray}
+								</Timeline>
+							</TimeLineHover>
+						</HoverHandler>
 					</div>
 				</div>
 			</div>
