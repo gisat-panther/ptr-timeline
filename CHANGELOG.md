@@ -1,3 +1,15 @@
+# v0.2.2 (Fri Sep 30 2022)
+
+#### 🐾 Patch
+
+- Fix width and zoom behaviour [#38](https://github.com/gisat-panther/ptr-timeline/pull/38) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.2.1 (Thu Jun 30 2022)
 
 #### 🐾 Patch
