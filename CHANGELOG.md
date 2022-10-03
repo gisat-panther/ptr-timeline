@@ -1,3 +1,15 @@
+# v0.2.3 (Mon Oct 03 2022)
+
+#### 🐾 Patch
+
+- Fix smoot zoom/move in timeline [#39](https://github.com/gisat-panther/ptr-timeline/pull/39) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.2.2 (Fri Sep 30 2022)
 
 #### 🐾 Patch
