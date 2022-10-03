@@ -88,6 +88,11 @@ const TimelineEventsWrapper = ({children}) => {
 	const decelerating = useRef(false);
 	const decVelX = useRef(0);
 
+	const lastUpdatedPeriodStart = useRef(null);
+	const lastUpdatedPeriodEnd = useRef(null);
+
+	const onWheelTimeoutRef = useRef(null);
+
 	// improvement everything to useRef?
 	const [_drag, set_drag] = useState(null);
 	const [_lastX, set_lastX] = useState(null);
@@ -146,12 +151,19 @@ const TimelineEventsWrapper = ({children}) => {
 		const allDays = width / dayWidth;
 		const periodStart = moment(periodLimit.start);
 		const periodEnd = moment(periodLimit.end);
-		let periodLimitStart = moment(period.start);
-		let periodLimitEnd = moment(period.end);
+
+		//if local periods are not set yet
+		if (!lastUpdatedPeriodStart.current || !lastUpdatedPeriodEnd.current) {
+			lastUpdatedPeriodStart.current = period.start;
+			lastUpdatedPeriodEnd.current = period.end;
+		}
+
+		let periodLimitStart = moment(lastUpdatedPeriodStart.current);
+		let periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 
 		//center time
 		const halfDays = allDays / 2;
-		let periodLimitCenter = moment(period.end).subtract(
+		let periodLimitCenter = moment(lastUpdatedPeriodEnd.current).subtract(
 			halfDays * (60 * 60 * 24 * 1000),
 			'ms'
 		);
@@ -165,14 +177,14 @@ const TimelineEventsWrapper = ({children}) => {
 
 				if (periodLimitCenter.isBefore(periodStart)) {
 					//use last periodLimit limit
-					periodLimitStart = moment(period.start);
-					periodLimitEnd = moment(period.end);
+					periodLimitStart = moment(lastUpdatedPeriodStart.current);
+					periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 				}
 			} else {
 				if (periodLimitStart.isBefore(periodStart)) {
 					//use last periodLimit limit
-					periodLimitStart = moment(period.start);
-					periodLimitEnd = moment(period.end);
+					periodLimitStart = moment(lastUpdatedPeriodStart.current);
+					periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 				}
 			}
 		} else {
@@ -183,14 +195,14 @@ const TimelineEventsWrapper = ({children}) => {
 			if (periodLimitOnCenter) {
 				if (periodLimitCenter.isAfter(periodEnd)) {
 					//use last periodLimit limit
-					periodLimitStart = moment(period.start);
-					periodLimitEnd = moment(period.end);
+					periodLimitStart = moment(lastUpdatedPeriodStart.current);
+					periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 				}
 			} else {
 				if (periodLimitEnd.isAfter(periodEnd)) {
 					//use last periodLimit limit
-					periodLimitStart = moment(period.start);
-					periodLimitEnd = moment(period.end);
+					periodLimitStart = moment(lastUpdatedPeriodStart.current);
+					periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 				}
 			}
 		}
@@ -213,6 +225,9 @@ const TimelineEventsWrapper = ({children}) => {
 			}
 		}
 
+		//temporary save period start/end localy. It is faster than wait for let bubble updated period to state and context
+		lastUpdatedPeriodStart.current = periodLimitStart.toDate().toString();
+		lastUpdatedPeriodEnd.current = periodLimitEnd.toDate().toString();
 		updateContext({
 			...(dragInfo.clientX ? {mouseX: dragInfo.clientX} : {}),
 			period: {
@@ -378,12 +393,18 @@ const TimelineEventsWrapper = ({children}) => {
 			minDayWidth,
 			width,
 		} = context;
+
+		if (!lastUpdatedPeriodStart.current || !lastUpdatedPeriodEnd.current) {
+			lastUpdatedPeriodStart.current = period.start;
+			lastUpdatedPeriodEnd.current = period.end;
+		}
+
 		const zoomX = x || mouseX;
 		const centerX = width / 2;
 		const mouseTime = zoomX ? getTime(zoomX) : getTime(mouseX);
 		const centerTime = getTime(centerX);
-		const periodLimitStart = moment(period.start);
-		const periodLimitEnd = moment(period.end);
+		const periodLimitStart = moment(lastUpdatedPeriodStart.current);
+		const periodLimitEnd = moment(lastUpdatedPeriodEnd.current);
 
 		if (newDayWidth > maxDayWidth) {
 			newDayWidth = maxDayWidth;
@@ -447,6 +468,10 @@ const TimelineEventsWrapper = ({children}) => {
 				end.add(diff, 'ms');
 			}
 		}
+
+		lastUpdatedPeriodStart.current = start.toDate().toString();
+		lastUpdatedPeriodEnd.current = end.toDate().toString();
+
 		updateContext({
 			period: {
 				start: start.toDate().toString(),
@@ -663,6 +688,11 @@ const TimelineEventsWrapper = ({children}) => {
 		}
 	};
 
+	const clearPeriodsRefs = () => {
+		lastUpdatedPeriodStart.current = null;
+		lastUpdatedPeriodEnd.current = null;
+	};
+
 	/**
 	 * Based on the amount of pixels the wheel moves update the size of the visible pixels.
 	 * @param e {SyntheticEvent}
@@ -682,6 +712,13 @@ const TimelineEventsWrapper = ({children}) => {
 		}
 
 		let newDayWidth = dayWidth * change;
+
+		//Clear periods after last onWheel
+		if (onWheelTimeoutRef.current) {
+			window.clearTimeout(onWheelTimeoutRef.current);
+		}
+		onWheelTimeoutRef.current = window.setTimeout(clearPeriodsRefs, 100);
+
 		zoom(newDayWidth);
 	};
 
