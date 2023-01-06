@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import {createContext} from 'react';
-export const Context = createContext({
+import Context from '@gisatcz/cross-package-react-context';
+
+const defaultContextValue = {
 	updateContext: null,
 	width: null,
 	height: null,
@@ -19,18 +19,13 @@ export const Context = createContext({
 	periodLimitVisible: null,
 	onClick: null,
 	onHover: null,
+	onHoverOut: null,
 	vertical: null,
 	periodLimitOnCenter: null,
 	selectMode: null,
 	moving: null,
-});
-
-export const ContextProvider = ({children, ...rest}) => {
-	return (
-		<Context.Provider value={{...rest.value}}>{children}</Context.Provider>
-	);
 };
 
-ContextProvider.propTypes = {
-	children: PropTypes.node,
+export default () => {
+	Context.getContext('TimeLineContext', defaultContextValue);
 };

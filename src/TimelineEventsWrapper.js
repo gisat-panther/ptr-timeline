@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import {useEffect, useRef, useState, useContext} from 'react';
 import moment from 'moment';
-import {Context as TimeLineContext} from './context';
+import Context from '@gisatcz/cross-package-react-context';
 
 /**
  *
@@ -82,7 +82,10 @@ const getPoint = (index, cachedEvents, tpCache, targetTouches) => {
 };
 
 const TimelineEventsWrapper = ({children}) => {
-	const context = useContext(TimeLineContext);
+	const defaultHoverContext = 'TimeLineContext';
+	const HoverContext = Context.getContext(defaultHoverContext);
+	const context = useContext(HoverContext);
+
 	const node = useRef();
 
 	const decelerating = useRef(false);
