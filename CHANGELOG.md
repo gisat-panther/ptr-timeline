@@ -1,3 +1,15 @@
+# v0.2.4 (Mon Jan 09 2023)
+
+#### 🐾 Patch
+
+- Use common hover from  ptr-core [#48](https://github.com/gisat-panther/ptr-timeline/pull/48) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v0.2.3 (Mon Oct 03 2022)
 
 #### 🐾 Patch
