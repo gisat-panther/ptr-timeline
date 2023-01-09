@@ -4,7 +4,7 @@ import moment from 'moment';
 import {useResizeDetector} from 'react-resize-detector';
 
 import usePrevious from './hooks/usePrevious';
-import {ContextProvider} from './context';
+import Context from '@gisatcz/cross-package-react-context';
 import TimelineContent from './TimelineContent';
 
 const CONTROLS_WIDTH = 0;
@@ -47,6 +47,7 @@ const Timeline = ({
 	onChange,
 	onClick = () => {},
 	onHover = () => {},
+	onHoverOut = () => {},
 	period,
 	periodLimit,
 	periodLimitOnCenter,
@@ -56,6 +57,8 @@ const Timeline = ({
 	onResize,
 	width,
 }) => {
+	const defaultHoverContext = 'TimeLineContext';
+	const HoverContext = Context.getContext(defaultHoverContext);
 	// constructor(props) {
 	// 	super(props);
 
@@ -371,7 +374,7 @@ const Timeline = ({
 	const minDayWidth = getDayWidthForPeriod(periodLimit, getXAxisWidth());
 	return (
 		<div className="ptr-timeline" ref={ref} style={{width: widthSelf}}>
-			<ContextProvider
+			<HoverContext.Provider
 				value={{
 					updateContext,
 					width: getXAxisWidth(),
@@ -390,6 +393,7 @@ const Timeline = ({
 					periodLimitVisible: true,
 					onClick,
 					onHover,
+					onHoverOut,
 					vertical,
 					periodLimitOnCenter,
 					selectMode,
@@ -397,7 +401,7 @@ const Timeline = ({
 				}}
 			>
 				<TimelineContent>{children}</TimelineContent>
-			</ContextProvider>
+			</HoverContext.Provider>
 		</div>
 	);
 };
@@ -417,6 +421,7 @@ Timeline.propTypes = {
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
 	onHover: PropTypes.func,
+	onHoverOut: PropTypes.func,
 	period: PropTypes.shape({
 		end: PropTypes.string,
 		start: PropTypes.string,

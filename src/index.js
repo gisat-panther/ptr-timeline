@@ -12,10 +12,11 @@ import MonthsLabels from './MonthsLabels';
 import Days from './Days';
 import DaysLabels from './DaysLabels';
 import TimeLineHover from './TimeLineHover';
-import HoverHandler from './HoverHandler/HoverHandler';
-import * as position from './HoverHandler/position';
+import initContext from './context';
 
 import utils from './utils';
+
+initContext();
 
 export {
 	Days,
@@ -33,6 +34,4 @@ export {
 	Months,
 	TimeLineHover,
 	utils,
-	HoverHandler,
-	position,
 };

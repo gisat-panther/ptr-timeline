@@ -5,8 +5,7 @@ import {utils} from '@gisatcz/ptr-utils';
 
 import Timeline from '../Timeline';
 import TimeLineHover from '../TimeLineHover';
-import HoverHandler from '../HoverHandler/HoverHandler';
-import {getTootlipPosition} from '../HoverHandler/position';
+import {HoverHandler, getTootlipPosition} from '@gisatcz/ptr-core';
 
 import XAxis from '../XAxis';
 
@@ -160,7 +159,10 @@ const MapTimeline = ({
 						<LegendComponent layers={layers} />
 					) : null}
 					<div className={'ptr-maptimeline-wrapper'}>
-						<HoverHandler getStyle={getHorizontalTootlipStyle()}>
+						<HoverHandler
+							getStyle={getHorizontalTootlipStyle()}
+							conextId={'TimeLineContext'}
+						>
 							<TimeLineHover getHoverContent={getHoverContent}>
 								<Timeline
 									dayWidth={timelineState.dayWidth}

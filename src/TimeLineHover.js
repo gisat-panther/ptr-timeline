@@ -1,13 +1,14 @@
-import {isValidElement, Children, cloneElement} from 'react';
+import {isValidElement, Children, cloneElement, useContext} from 'react';
 import PropTypes from 'prop-types';
-
-import hoverContext from './HoverHandler/context';
-import {useContext} from 'react';
+import Context from '@gisatcz/cross-package-react-context';
 
 const TimelineHover = ({getHoverContent, children}) => {
-	const context = useContext(hoverContext);
+	const defaultHoverContext = 'TimeLineContext';
+	const HoverContext = Context.getContext(defaultHoverContext);
+	const context = useContext(HoverContext);
 
-	const onHover = evt => {
+	const onHoverOut = context?.onHoverOut;
+	const onHover = (evt, hoveredItems = []) => {
 		const popupContent =
 			(evt && getHoverContent(evt.x, evt.time, evt, context)) || null;
 		if (
@@ -19,20 +20,28 @@ const TimelineHover = ({getHoverContent, children}) => {
 				x: evt.x,
 				y: evt.y,
 			};
-			context.onHover([hoverItem], {
-				popup: {
-					x: evt.x,
-					y: evt.y,
-					content: popupContent,
-				},
-			});
+			if (typeof context?.onHover === 'function') {
+				context?.onHover([hoverItem, ...hoveredItems], {
+					popup: {
+						x: evt.x,
+						y: evt.y,
+						content: popupContent,
+					},
+				});
+			}
 		} else {
-			context.onHoverOut();
+			if (typeof context?.onHoverOut === 'function') {
+				context?.onHoverOut();
+			}
 		}
 	};
 
 	const childrenElms = Children.map(children, child =>
-		cloneElement(child, {...child.props, onHover: onHover})
+		cloneElement(child, {
+			...child.props,
+			onHover,
+			onHoverOut,
+		})
 	);
 
 	return <>{childrenElms}</>;

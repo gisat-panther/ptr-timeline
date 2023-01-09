@@ -1,6 +1,5 @@
 import {useContext, Children, cloneElement} from 'react';
-
-import {Context as TimeLineContext} from './context';
+import Context from '@gisatcz/cross-package-react-context';
 
 import TimelineEventsWrapper from './TimelineEventsWrapper';
 
@@ -9,7 +8,9 @@ import propTypes from 'prop-types';
 import './style.scss';
 
 const TimelineContent = ({children, ...propsWithoutChildren}) => {
-	const context = useContext(TimeLineContext);
+	const defaultHoverContext = 'TimeLineContext';
+	const HoverContext = Context.getContext(defaultHoverContext);
+	const context = useContext(HoverContext);
 	const {
 		periodLimit,
 		height,

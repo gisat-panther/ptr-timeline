@@ -1,14 +1,15 @@
 import {useContext} from 'react';
 import PropTypes from 'prop-types';
-
 import classNames from 'classnames';
-import hoverContext from '../HoverHandler/context';
+import Context from '@gisatcz/cross-package-react-context';
 import './style.scss';
 
 const MIN_OVERLAY_WIDTH = 5; //in pixels
 
 const OverlayItem = ({overlay, getX, vertical, onClick}) => {
-	const context = useContext(hoverContext);
+	const defaultHoverContext = 'TimeLineContext';
+	const HoverContext = Context.getContext(defaultHoverContext);
+	const context = useContext(HoverContext);
 
 	const start = getX(overlay.start);
 	const end = getX(overlay.end);
@@ -30,18 +31,16 @@ const OverlayItem = ({overlay, getX, vertical, onClick}) => {
 
 	const onMouseEnter = evt => {
 		context.onHover(
+			{
+				x: evt.pageX,
+				y: evt.pageY,
+			},
 			[
 				{
 					key: overlay.key,
 					overlay,
 				},
-			],
-			{
-				popup: {
-					x: evt.clientX,
-					y: evt.clientY,
-				},
-			}
+			]
 		);
 	};
 
